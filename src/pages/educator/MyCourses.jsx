@@ -95,16 +95,18 @@ const MyCourses = () => {
           border-radius: 8px;
           cursor: pointer;
           font-size: 14px;
-          transition: 0.2s ease;
+          transition: 0.25s ease;
         }
 
         .sidebar li:hover {
           background: #f1f1ff;
+          transform: translateX(4px);
         }
 
         .sidebar li.active {
           background: #6c63ff;
           color: white;
+          box-shadow: 0 10px 20px rgba(108, 99, 255, 0.28);
         }
 
         /* MAIN */
@@ -177,7 +179,7 @@ const MyCourses = () => {
           border-radius: 18px;
           overflow: hidden;
           box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-          transition: 0.3s ease;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
           cursor: pointer;
         }
 
@@ -190,6 +192,11 @@ const MyCourses = () => {
           width: 100%;
           height: 180px;
           object-fit: cover;
+          transition: transform 0.35s ease;
+        }
+
+        .course-card:hover .course-image {
+          transform: scale(1.05);
         }
 
         .course-body {
@@ -249,7 +256,7 @@ const MyCourses = () => {
               Create Course
             </li>
 
-            <li>Students</li>
+            <li onClick={() => navigate("/educator/students")}>Students</li>
             <li onClick={() => navigate("/educator/settings")}>Settings</li>
           </ul>
         </div>

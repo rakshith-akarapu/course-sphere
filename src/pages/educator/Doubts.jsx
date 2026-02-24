@@ -68,6 +68,7 @@ const Doubts = () => {
 
       .back-btn:hover{
         background:#f1f1ff;
+        transform:translateX(-2px);
       }
 
       .page-title{
@@ -145,7 +146,7 @@ const Doubts = () => {
 
           <div
             className="back-btn"
-            onClick={()=>navigate(-1)}
+            onClick={()=>navigate("/educator/courses")}
           >
             <FaArrowLeft />
             Back

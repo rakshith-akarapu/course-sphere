@@ -28,35 +28,67 @@ function detectRole(email) {
     : "student";
 }
 
+export function normalizeRole(role) {
+  const normalized = String(role || "").trim().toLowerCase();
+  return normalized === "educator" ? "educator" : "student";
+}
+
 /* ---------------- CREATE USER ---------------- */
 
 export function createUserFromLogin(identifier) {
-  const email = identifier.trim().toLowerCase();
+  const trimmed = identifier.trim();
+  const email = trimmed.toLowerCase();
+  const safeSlug = email.replace(/[^a-z0-9]+/g, "");
+  const resolvedEmail = email.includes("@")
+    ? email
+    : `${safeSlug || "learner"}@coursesphere.com`;
 
   return {
-    name: formatDisplayName(identifier),
-    email,
-    role: detectRole(email), // 🔥 IMPORTANT
+    name: formatDisplayName(trimmed),
+    email: resolvedEmail,
+    role: detectRole(resolvedEmail),
   };
 }
 
 /* ---------------- STORAGE ---------------- */
 
 export function getCurrentUser() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const raw = localStorage.getItem(USER_STORAGE_KEY);
   if (!raw) return null;
 
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return {
+      ...parsed,
+      role: normalizeRole(parsed?.role),
+    };
   } catch {
     return null;
   }
 }
 
 export function setCurrentUser(user) {
-  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  localStorage.setItem(
+    USER_STORAGE_KEY,
+    JSON.stringify({
+      ...user,
+      role: normalizeRole(user?.role),
+    }),
+  );
 }
 
 export function clearCurrentUser() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   localStorage.removeItem(USER_STORAGE_KEY);
 }

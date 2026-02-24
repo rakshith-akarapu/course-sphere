@@ -63,16 +63,18 @@ const CreateCourse = () => {
           border-radius: 8px;
           cursor: pointer;
           font-size: 14px;
-          transition: 0.2s ease;
+          transition: 0.25s ease;
         }
 
         .sidebar li:hover {
           background: #f1f1ff;
+          transform: translateX(4px);
         }
 
         .sidebar li.active {
           background: #6c63ff;
           color: white;
+          box-shadow: 0 10px 20px rgba(108, 99, 255, 0.28);
         }
 
         /* MAIN */
@@ -100,6 +102,12 @@ const CreateCourse = () => {
           border-radius: 8px;
           width: 250px;
           gap: 10px;
+          transition: 0.2s ease;
+        }
+
+        .search-container:focus-within {
+          background: #fff;
+          border: 1px solid #6c63ff;
         }
 
         .search-container input {
@@ -147,6 +155,12 @@ const CreateCourse = () => {
           border-radius: 18px;
           overflow: hidden;
           box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .video-section:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 18px 36px rgba(0,0,0,0.08);
         }
 
         .placeholder-video {
@@ -253,6 +267,12 @@ const CreateCourse = () => {
           align-items: center;
           gap: 6px;
           font-size: 13px;
+          transition: 0.2s ease;
+        }
+
+        .add-lesson-btn:hover {
+          background: #574fd6;
+          transform: translateY(-1px);
         }
 
         .save-wrapper {
@@ -276,6 +296,7 @@ const CreateCourse = () => {
 
         .save-btn:hover {
           background: #574fd6;
+          transform: translateY(-1px);
         }
 
       `}</style>

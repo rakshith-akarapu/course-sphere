@@ -30,19 +30,21 @@ const CourseEditor = () => {
         .dashboard { display:flex; background:#f4f6fb; min-height:100vh; }
         .sidebar { width:230px; background:white; padding:30px 20px; border-right:1px solid #eee; }
         .sidebar h2 { color:#6c63ff; margin-bottom:35px; }
-        .sidebar li { list-style:none; padding:12px; margin-bottom:12px; border-radius:8px; cursor:pointer; font-size:14px; }
-        .sidebar li:hover { background:#f1f1ff; }
-        .sidebar li.active { background:#6c63ff; color:white; }
+        .sidebar li { list-style:none; padding:12px; margin-bottom:12px; border-radius:8px; cursor:pointer; font-size:14px; transition:0.25s ease; }
+        .sidebar li:hover { background:#f1f1ff; transform:translateX(4px); }
+        .sidebar li.active { background:#6c63ff; color:white; box-shadow:0 10px 20px rgba(108, 99, 255, 0.28); }
         .main { flex:1; display:flex; flex-direction:column; }
         .topbar { background:white; padding:15px 35px; display:flex; justify-content:space-between; border-bottom:1px solid #eee; }
-        .search-container { display:flex; align-items:center; background:#f4f6fb; padding:8px 15px; border-radius:8px; width:250px; gap:10px; }
+        .search-container { display:flex; align-items:center; background:#f4f6fb; padding:8px 15px; border-radius:8px; width:250px; gap:10px; transition:0.2s ease; }
+        .search-container:focus-within { background:#fff; border:1px solid #6c63ff; }
         .search-container input { border:none; background:transparent; outline:none; width:100%; }
         .nav-right { display:flex; gap:30px; align-items:center; }
         .content { padding:30px 50px; }
         .top-header { display:flex; align-items:center; gap:20px; margin-bottom:25px; }
         .back-btn { cursor:pointer; color:#6c63ff; display:flex; align-items:center; gap:8px; }
         .editor-layout { display:grid; grid-template-columns:2fr 1fr; gap:30px; }
-        .video-section { background:white; border-radius:18px; overflow:hidden; box-shadow:0 12px 30px rgba(0,0,0,0.05); }
+        .video-section { background:white; border-radius:18px; overflow:hidden; box-shadow:0 12px 30px rgba(0,0,0,0.05); transition:transform 0.25s ease, box-shadow 0.25s ease; }
+        .video-section:hover { transform:translateY(-2px); box-shadow:0 18px 36px rgba(0,0,0,0.08); }
         .video-wrapper { position:relative; width:100%; padding-top:56.25%; }
         .video-wrapper iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; }
         .course-title { font-size:20px; font-weight:600; padding:20px; }
@@ -52,7 +54,8 @@ const CourseEditor = () => {
         .tab-content { padding:25px; }
         textarea, input { width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-top:10px; }
         .action-wrapper { margin-top:30px; display:flex; justify-content:flex-end; gap:15px; }
-        .btn { padding:12px 20px; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:8px; font-weight:600; color:white; }
+        .btn { padding:12px 20px; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:8px; font-weight:600; color:white; transition:0.2s ease; }
+        .btn:hover { transform:translateY(-1px); filter:brightness(0.96); }
         .save { background:#6c63ff; }
         .doubt { background:#00b894; }
         .assign { background:#0984e3; }
@@ -67,6 +70,7 @@ const CourseEditor = () => {
             <li className="active" onClick={()=>navigate("/educator/courses")}>My Courses</li>
             <li onClick={()=>navigate("/educator/create-course")}>Create Course</li>
             <li onClick={()=>navigate("/educator/students")}>Students</li>
+            <li onClick={()=>navigate("/educator/settings")}>Settings</li>
           </ul>
         </div>
 

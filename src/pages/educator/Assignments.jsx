@@ -78,6 +78,11 @@ const Assignments = () => {
         display:flex;
         align-items:center;
         gap:6px;
+        transition:0.2s ease;
+      }
+
+      .back-btn:hover{
+        transform:translateX(-2px);
       }
 
       .course-title{
@@ -93,6 +98,12 @@ const Assignments = () => {
         border-radius:8px;
         width:250px;
         gap:10px;
+        transition:0.2s ease;
+      }
+
+      .search-container:focus-within{
+        background:#fff;
+        border:1px solid #6c63ff;
       }
 
       .search-container input{
@@ -120,6 +131,12 @@ const Assignments = () => {
         border-radius:12px;
         margin-bottom:25px;
         box-shadow:0 5px 15px rgba(0,0,0,0.05);
+        transition:0.25s ease;
+      }
+
+      .assignment-card:hover{
+        transform:translateY(-3px);
+        box-shadow:0 12px 28px rgba(0,0,0,0.08);
       }
 
       .assignment-title{
@@ -153,6 +170,13 @@ const Assignments = () => {
         padding:6px;
         border-radius:6px;
         border:1px solid #ddd;
+        transition:0.2s ease;
+      }
+
+      .grade-input:focus{
+        outline:none;
+        border-color:#6c63ff;
+        box-shadow:0 0 0 3px rgba(108, 99, 255, 0.15);
       }
 
       .graded{
@@ -171,7 +195,7 @@ const Assignments = () => {
 
           <div
             className="back-btn"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/educator/courses")}
           >
             <FaArrowLeft /> Back
           </div>

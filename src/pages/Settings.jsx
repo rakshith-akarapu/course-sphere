@@ -1,20 +1,48 @@
+import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
-import { getCurrentUser } from "../utils/auth";
+import { getCurrentUser, setCurrentUser } from "../utils/auth";
 import "../styles/settings.css";
 
 function Settings() {
   const currentUser = getCurrentUser();
   const fullName = currentUser?.name || "Learner";
   const nameParts = fullName.split(" ");
-  const firstName = nameParts[0] || "Learner";
-  const lastName = nameParts.slice(1).join(" ");
-  const email = currentUser?.email || "learner@coursesphere.com";
-  const phone = currentUser?.phone || "+91 0000000000";
-  const country = currentUser?.country || "India";
-  const location = currentUser?.location || "Not set";
-  const designation = currentUser?.designation || "Learner";
-  const role = currentUser?.role || "Student";
+  const initialFirstName = nameParts[0] || "Learner";
+  const initialLastName = nameParts.slice(1).join(" ");
+  const initialEmail = currentUser?.email || "learner@coursesphere.com";
+  const initialPhone = currentUser?.phone || "";
+  const initialCountry = currentUser?.country || "India";
+  const initialLocation = currentUser?.location || "Not set";
+  const initialDesignation = currentUser?.designation || "Learner";
+  const [firstName, setFirstName] = useState(initialFirstName);
+  const [lastName, setLastName] = useState(initialLastName);
+  const [email, setEmail] = useState(initialEmail);
+  const [phone, setPhone] = useState(initialPhone.replace("+91", "").trim());
+  const [country, setCountry] = useState(initialCountry);
+  const [location, setLocation] = useState(initialLocation);
+  const [designation, setDesignation] = useState(initialDesignation);
+  const [saved, setSaved] = useState(false);
+  const mergedName = `${firstName.trim() || "Learner"} ${lastName.trim()}`.trim();
+  const mergedPhone = phone.trim() ? `+91 ${phone.trim()}` : "";
+  const role = currentUser?.role
+    ? `${currentUser.role.charAt(0).toUpperCase()}${currentUser.role.slice(1)}`
+    : "Student";
+
+  const handleSave = () => {
+    setCurrentUser({
+      ...(currentUser || {}),
+      name: mergedName,
+      email: email.trim().toLowerCase() || "learner@coursesphere.com",
+      phone: mergedPhone,
+      country: country.trim() || "India",
+      location: location.trim() || "Not set",
+      designation: designation.trim() || "Learner",
+      role: currentUser?.role || "student",
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1600);
+  };
 
   return (
     <div className="dashboard-layout">
@@ -37,7 +65,7 @@ function Settings() {
               />
             </div>
 
-            <h3>{fullName}</h3>
+            <h3>{mergedName}</h3>
             <p>{location}</p>
             <p>{country}</p>
 
@@ -51,7 +79,7 @@ function Settings() {
             <hr />
 
             <div className="profile-contact">
-              <p>📞 {phone}</p>
+              <p>📞 {mergedPhone || "Not set"}</p>
               <p>✉ {email}</p>
               <p>📄 PDT - I</p>
             </div>
@@ -66,24 +94,40 @@ function Settings() {
 
               <div className="form-group">
                 <label>First Name</label>
-                <input type="text" defaultValue={firstName} />
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                />
               </div>
 
               <div className="form-group">
                 <label>Last Name</label>
-                <input type="text" defaultValue={lastName} />
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                />
               </div>
 
               <div className="form-group">
                 <label>Email</label>
-                <input type="email" defaultValue={email} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
               </div>
 
               <div className="form-group phone-group">
                 <label>Phone Number</label>
                 <div className="phone-input">
                   <span className="country-code">🇮🇳 +91</span>
-                  <input type="text" defaultValue={phone.replace("+91", "").trim()} />
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                  />
                 </div>
               </div>
 
@@ -94,8 +138,7 @@ function Settings() {
 
               <div className="form-group">
                 <label>Nationality</label>
-                <select defaultValue={country}>
-                  <option>{country}</option>
+                <select value={country} onChange={(event) => setCountry(event.target.value)}>
                   <option>India</option>
                   <option>USA</option>
                   <option>UK</option>
@@ -104,8 +147,10 @@ function Settings() {
 
               <div className="form-group">
                 <label>Designation</label>
-                <select defaultValue={designation}>
-                  <option>{designation}</option>
+                <select
+                  value={designation}
+                  onChange={(event) => setDesignation(event.target.value)}
+                >
                   <option>Developer</option>
                   <option>Designer</option>
                   <option>Student</option>
@@ -113,10 +158,20 @@ function Settings() {
                 </select>
               </div>
 
+              <div className="form-group">
+                <label>Location</label>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(event) => setLocation(event.target.value)}
+                />
+              </div>
+
             </div>
 
             <div className="save-btn-wrapper">
-              <button className="save-btn">Save</button>
+              <button className="save-btn" onClick={handleSave}>Save</button>
+              {saved && <p className="save-status">Profile updated</p>}
             </div>
 
           </div>

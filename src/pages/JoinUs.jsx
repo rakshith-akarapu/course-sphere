@@ -44,13 +44,13 @@ function JoinUs() {
       name: formatDisplayName(trimmedFullName),
       email: trimmedEmail,
       phone: phone.trim() || "",
-      role: isEducator ? "Educator" : "Student",
+      role: isEducator ? "educator" : "student",
       designation: profileDesignation,
       location: yearSemester.trim() || "Not set",
       country: "India",
     });
 
-    navigate("/dashboard");
+    navigate(isEducator ? "/educator/dashboard" : "/dashboard");
   };
 
   return (

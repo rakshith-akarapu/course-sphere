@@ -118,3 +118,10 @@
 .save-btn:hover {
   opacity: 0.9;
 }
+
+.save-status {
+  margin-top: 12px;
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 600;
+}

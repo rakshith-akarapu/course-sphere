@@ -64,16 +64,18 @@ const Students = () => {
           border-radius: 8px;
           cursor: pointer;
           font-size: 14px;
-          transition: 0.2s ease;
+          transition: 0.25s ease;
         }
 
         .sidebar li:hover {
           background: #f1f1ff;
+          transform: translateX(4px);
         }
 
         .sidebar li.active {
           background: #6c63ff;
           color: white;
+          box-shadow: 0 10px 20px rgba(108, 99, 255, 0.28);
         }
 
         /* MAIN */
@@ -101,6 +103,12 @@ const Students = () => {
           border-radius: 8px;
           width: 250px;
           gap: 10px;
+          transition: 0.2s ease;
+        }
+
+        .search-container:focus-within {
+          background: #fff;
+          border: 1px solid #6c63ff;
         }
 
         .search-container input {
@@ -126,6 +134,12 @@ const Students = () => {
           padding: 25px;
           border-radius: 16px;
           box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 14px 28px rgba(0,0,0,0.08);
         }
 
         .card-header {
@@ -151,6 +165,10 @@ const Students = () => {
           padding: 12px;
           border-bottom: 1px solid #eee;
           font-size: 14px;
+        }
+
+        tbody tr:hover {
+          background: #f8faff;
         }
 
         th {

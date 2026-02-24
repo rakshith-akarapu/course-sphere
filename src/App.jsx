@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { getCurrentUser } from "./utils/auth";
+import { getCurrentUser, normalizeRole } from "./utils/auth";
 
 /* ---------------- STUDENT PAGES ---------------- */
 import Login from "./pages/Login";
@@ -30,14 +30,15 @@ import EducatorSettings from "./pages/educator/Settings";
 
 function RequireRole({ children, role }) {
   const user = getCurrentUser();
+  const userRole = normalizeRole(user?.role);
 
   if (!user) {
     return <Navigate to="/" replace />;
   }
 
-  if (user.role !== role) {
+  if (userRole !== role) {
     // Redirect user to their correct dashboard
-    return user.role === "educator"
+    return userRole === "educator"
       ? <Navigate to="/educator/dashboard" replace />
       : <Navigate to="/dashboard" replace />;
   }
@@ -49,10 +50,11 @@ function RequireRole({ children, role }) {
 
 function RedirectByRole() {
   const user = getCurrentUser();
+  const userRole = normalizeRole(user?.role);
 
   if (!user) return <Navigate to="/" replace />;
 
-  return user.role === "educator"
+  return userRole === "educator"
     ? <Navigate to="/educator/dashboard" replace />
     : <Navigate to="/dashboard" replace />;
 }

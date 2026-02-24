@@ -8,9 +8,12 @@ import {
   FaTrash,
   FaSearch
 } from "react-icons/fa";
+import { getCurrentUser } from "../../../utils/auth";
 
 const EducatorDashboard = () => {
   const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+  const firstName = currentUser?.name?.split(" ")[0] || "Educator";
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -88,16 +91,18 @@ const EducatorDashboard = () => {
           border-radius: 8px;
           cursor: pointer;
           font-size: 14px;
-          transition: 0.2s ease;
+          transition: 0.25s ease;
         }
 
         .sidebar li:hover {
           background: #f1f1ff;
+          transform: translateX(4px);
         }
 
         .sidebar li.active {
           background: #6c63ff;
           color: white;
+          box-shadow: 0 10px 20px rgba(108, 99, 255, 0.28);
         }
 
         /* MAIN */
@@ -125,6 +130,12 @@ const EducatorDashboard = () => {
           border-radius: 8px;
           width: 250px;
           gap: 10px;
+          transition: 0.2s ease;
+        }
+
+        .search-container:focus-within {
+          background: #fff;
+          border: 1px solid #6c63ff;
         }
 
         .search-container input {
@@ -176,6 +187,12 @@ const EducatorDashboard = () => {
           border-radius: 12px;
           text-align: center;
           box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .stat-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 26px rgba(0,0,0,0.08);
         }
 
         .bottom-grid {
@@ -189,6 +206,12 @@ const EducatorDashboard = () => {
           padding: 20px;
           border-radius: 12px;
           box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 24px rgba(0,0,0,0.08);
         }
 
         .deadline-item {
@@ -258,6 +281,13 @@ const EducatorDashboard = () => {
           color: white;
           border: none;
           border-radius: 6px;
+          cursor: pointer;
+          transition: 0.2s ease;
+        }
+
+        .todo button:hover {
+          background: #574fd6;
+          transform: translateY(-1px);
         }
 
         .task {
@@ -305,7 +335,7 @@ const EducatorDashboard = () => {
           <div className="content">
 
             <div className="greeting">
-              <h1>Hello Nikhil 👋</h1>
+              <h1>Hello {firstName} 👋</h1>
               <p>Let’s build something amazing today!</p>
             </div>
 
