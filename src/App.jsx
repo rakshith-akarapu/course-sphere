@@ -1,4 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { getCurrentUser } from "./utils/auth";
+
+/* ---------------- STUDENT PAGES ---------------- */
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -11,63 +14,214 @@ import Settings from "./pages/Settings";
 import JoinUs from "./pages/JoinUs";
 import Assignments from "./pages/Assignments";
 import AssignmentUpload from "./pages/AssignmentUpload";
-import { getCurrentUser } from "./utils/auth";
 
-function RequireAuth({ children }) {
-  return getCurrentUser() ? children : <Navigate to="/" replace />;
+/* ---------------- EDUCATOR PAGES ---------------- */
+import EducatorDashboard from "./pages/educator/dashboard/EducatorDashboard";
+import EducatorRegister from "./pages/educator/EducatorRegister";
+import EducatorAssignments from "./pages/educator/Assignments";
+import CreateCourse from "./pages/educator/CreateCourse";
+import CourseEditor from "./pages/educator/CourseEditor";
+import EducatorMyCourses from "./pages/educator/MyCourses";
+import Students from "./pages/educator/Students";
+import Doubts from "./pages/educator/Doubts";
+
+/* ---------------- ROLE PROTECTION ---------------- */
+
+function RequireRole({ children, role }) {
+  const user = getCurrentUser();
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (user.role !== role) {
+    // Redirect user to their correct dashboard
+    return user.role === "educator"
+      ? <Navigate to="/educator/dashboard" replace />
+      : <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
 }
 
-function GuestOnly({ children }) {
-  return getCurrentUser() ? <Navigate to="/dashboard" replace /> : children;
+/* ---------------- REDIRECT BASED ON ROLE ---------------- */
+
+function RedirectByRole() {
+  const user = getCurrentUser();
+
+  if (!user) return <Navigate to="/" replace />;
+
+  return user.role === "educator"
+    ? <Navigate to="/educator/dashboard" replace />
+    : <Navigate to="/dashboard" replace />;
 }
+
+/* ---------------- APP ---------------- */
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<GuestOnly><Login /></GuestOnly>} />
-        <Route path="/register" element={<GuestOnly><Register /></GuestOnly>} />
+
+        {/* -------- PUBLIC -------- */}
+
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/join/:role" element={<JoinUs />} />
+        <Route path="/educator/register" element={<EducatorRegister />} />
+
+        {/* -------- STUDENT ROUTES -------- */}
+
         <Route
           path="/dashboard"
-          element={<RequireAuth><Dashboard /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <Dashboard />
+            </RequireRole>
+          }
         />
+
         <Route
           path="/courses"
-          element={<RequireAuth><MyCourses /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <MyCourses />
+            </RequireRole>
+          }
         />
+
         <Route
           path="/video/:id"
-          element={<RequireAuth><CourseVideo /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <CourseVideo />
+            </RequireRole>
+          }
         />
+
         <Route
           path="/video/:id/assignments"
-          element={<RequireAuth><Assignments /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <Assignments />
+            </RequireRole>
+          }
         />
+
         <Route
           path="/video/:id/assignments/:assignmentId/upload"
-          element={<RequireAuth><AssignmentUpload /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <AssignmentUpload />
+            </RequireRole>
+          }
         />
+
         <Route
           path="/explore"
-          element={<RequireAuth><Explore /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <Explore />
+            </RequireRole>
+          }
         />
+
         <Route
           path="/overview/:id"
-          element={<RequireAuth><CourseOverview /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <CourseOverview />
+            </RequireRole>
+          }
         />
+
         <Route
           path="/calendar"
-          element={<RequireAuth><Calendar /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <Calendar />
+            </RequireRole>
+          }
         />
+
         <Route
           path="/settings"
-          element={<RequireAuth><Settings /></RequireAuth>}
+          element={
+            <RequireRole role="student">
+              <Settings />
+            </RequireRole>
+          }
         />
-        <Route path="/join/:role" element={<JoinUs />} />
+
+        {/* -------- EDUCATOR ROUTES -------- */}
+
         <Route
-          path="*"
-          element={<Navigate to={getCurrentUser() ? "/dashboard" : "/"} replace />}
+          path="/educator/dashboard"
+          element={
+            <RequireRole role="educator">
+              <EducatorDashboard />
+            </RequireRole>
+          }
         />
+
+        <Route
+          path="/educator/courses"
+          element={
+            <RequireRole role="educator">
+              <EducatorMyCourses />
+            </RequireRole>
+          }
+        />
+
+        <Route
+          path="/educator/create-course"
+          element={
+            <RequireRole role="educator">
+              <CreateCourse />
+            </RequireRole>
+          }
+        />
+
+        <Route
+          path="/educator/course-editor/:id"
+          element={
+            <RequireRole role="educator">
+              <CourseEditor />
+            </RequireRole>
+          }
+        />
+
+        <Route
+          path="/educator/assignments"
+          element={
+            <RequireRole role="educator">
+              <EducatorAssignments />
+            </RequireRole>
+          }
+        />
+
+        <Route
+          path="/educator/students"
+          element={
+            <RequireRole role="educator">
+              <Students />
+            </RequireRole>
+          }
+        />
+
+        <Route
+          path="/educator/doubts"
+          element={
+            <RequireRole role="educator">
+              <Doubts />
+            </RequireRole>
+          }
+        />
+
+        {/* -------- FALLBACK -------- */}
+
+        <Route path="*" element={<RedirectByRole />} />
+
       </Routes>
     </BrowserRouter>
   );

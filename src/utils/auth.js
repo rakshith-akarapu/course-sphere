@@ -1,5 +1,7 @@
 const USER_STORAGE_KEY = "course_sphere_current_user";
 
+/* ---------------- NAME FORMAT ---------------- */
+
 function toTitleCase(value) {
   return value
     .split(" ")
@@ -10,56 +12,51 @@ function toTitleCase(value) {
 
 export function formatDisplayName(identifier) {
   const trimmed = identifier.trim();
-  if (!trimmed) {
-    return "Learner";
-  }
+  if (!trimmed) return "Learner";
 
   const base = trimmed.includes("@") ? trimmed.split("@")[0] : trimmed;
   const normalized = base.replace(/[._-]+/g, " ").replace(/\s+/g, " ").trim();
+
   return toTitleCase(normalized) || "Learner";
 }
 
+/* ---------------- ROLE DETECTION ---------------- */
+
+function detectRole(email) {
+  return email.toLowerCase().endsWith("edu@gmail.com")
+    ? "educator"
+    : "student";
+}
+
+/* ---------------- CREATE USER ---------------- */
+
 export function createUserFromLogin(identifier) {
-  const trimmed = identifier.trim();
-  const safeSlug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, "");
-  const fallbackEmail = `${safeSlug || "learner"}@coursesphere.com`;
-  const email = trimmed.includes("@") ? trimmed.toLowerCase() : fallbackEmail;
+  const email = identifier.trim().toLowerCase();
 
   return {
-    name: formatDisplayName(trimmed),
+    name: formatDisplayName(identifier),
     email,
+    role: detectRole(email), // 🔥 IMPORTANT
   };
 }
 
-export function getCurrentUser() {
-  if (typeof window === "undefined") {
-    return null;
-  }
+/* ---------------- STORAGE ---------------- */
 
-  const rawValue = window.localStorage.getItem(USER_STORAGE_KEY);
-  if (!rawValue) {
-    return null;
-  }
+export function getCurrentUser() {
+  const raw = localStorage.getItem(USER_STORAGE_KEY);
+  if (!raw) return null;
 
   try {
-    return JSON.parse(rawValue);
+    return JSON.parse(raw);
   } catch {
     return null;
   }
 }
 
 export function setCurrentUser(user) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
 }
 
 export function clearCurrentUser() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.removeItem(USER_STORAGE_KEY);
+  localStorage.removeItem(USER_STORAGE_KEY);
 }
