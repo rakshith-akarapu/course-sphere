@@ -1,114 +1,70 @@
-import { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { createUserFromLogin, setCurrentUser } from "../utils/auth";
-import "../styles/auth.css";
+import "../styles/Login.css";
+import img from "../assets/login.png";
+import google from "../assets/google.png";
 
 function Login() {
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    const trimmedIdentifier = identifier.trim();
-    const trimmedPassword = password.trim();
+    const navigate = useNavigate();
 
-    if (!trimmedIdentifier || !trimmedPassword) {
-      setErrorMessage("Please enter username/email and password.");
-      return;
-    }
+    return (
+        <div className="login">
 
-    setCurrentUser(createUserFromLogin(trimmedIdentifier));
-    navigate("/dashboard");
-  };
+            <div className="left">
+                <h1 className="logo">CourseSphere</h1>
+                <img src={img} className="image" alt="login" />
+            </div>
 
-  return (
-    <div className="login-container">
+            <div className="right">
 
-      {/* LEFT SIDE */}
-      <div className="login-left">
-        <h2 className="logo">
-          <span className="diamond"></span>
-          CourseSphere
-        </h2>
+                <h2 className="title">
+                    Welcome Back to CourseSphere
+                </h2>
 
-        <div className="illustration-box">
-          <img src="/login-image.png" alt="illustration" />
+                <div className="tabs">
+                    <button className="tab active">
+                        Login
+                    </button>
+
+                    <button
+                        className="tab"
+                        onClick={() => navigate("/register")}
+                    >
+                        Register
+                    </button>
+                </div>
+
+                <label>User name / Email</label>
+                <input type="text" placeholder="Enter your User name / Email" />
+
+                <label>Password</label>
+                <input type="password" placeholder="Enter your Password" />
+
+                <button className="google">
+                    <img src={google} className="googleIcon" alt="google" />
+                    Continue with Google
+                </button>
+
+                <div className="options">
+                    <div>
+                        <input type="checkbox" /> Remember me
+                    </div>
+                    <p>Forgot Password ?</p>
+                </div>
+
+                {/* ✅ UPDATED */}
+                <button
+                    type="button"
+                    className="loginBtn"
+                    onClick={() => navigate("/educator/dashboard")}
+                >
+                    Login
+                </button>
+
+            </div>
         </div>
-      </div>
-
-      {/* RIGHT SIDE */}
-      <div className="login-right">
-
-        <p className="welcome-text">
-          Welcome Back to CourseSphere .
-        </p>
-
-        {/* TOGGLE BUTTONS */}
-        <div className="toggle-buttons">
-          <button
-            className="active"
-            onClick={() => navigate("/")}
-          >
-            Login
-          </button>
-
-          <button
-            onClick={() => navigate("/register")}
-          >
-            Register
-          </button>
-        </div>
-
-        <label>User name / Email</label>
-        <input
-          type="text"
-          placeholder="Enter your User name / Email"
-          value={identifier}
-          onChange={(event) => {
-            setIdentifier(event.target.value);
-            if (errorMessage) {
-              setErrorMessage("");
-            }
-          }}
-        />
-
-        <label>Password</label>
-        <input
-          type="password"
-          placeholder="Enter your Password"
-          value={password}
-          onChange={(event) => {
-            setPassword(event.target.value);
-            if (errorMessage) {
-              setErrorMessage("");
-            }
-          }}
-        />
-
-        {errorMessage && <p className="auth-error">{errorMessage}</p>}
-
-        <button className="google-btn">
-          Continue with Google
-        </button>
-
-        <div className="remember-row">
-          <span>
-            <input type="checkbox" /> Remember me
-          </span>
-          <span>Forgot Password ?</span>
-        </div>
-
-        <button
-          className="main-btn"
-          onClick={handleLogin}
-        >
-          Login
-        </button>
-
-      </div>
-    </div>
-  );
+    );
 }
 
 export default Login;

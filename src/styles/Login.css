@@ -1,0 +1,161 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+background:#f3f3f3;
+}
+
+/* PAGE LAYOUT */
+
+.login{
+display:flex;
+height:100vh;
+width:100%;
+}
+
+/* LEFT SIDE */
+
+.left{
+flex:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+}
+
+.logo{
+font-size:34px;
+font-weight:bold;
+margin-bottom:30px;
+color:#555;
+}
+
+.image{
+width: 800px;   /* KEEPING EXACT 600px */
+}
+
+/* RIGHT SIDE */
+
+.right{
+flex:1;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:flex-start;   /* important */
+padding-left:60px;        /* reduced gap */
+}
+
+/* TITLE */
+
+.title{
+font-size:20px;
+margin-bottom:20px;
+color:#333;
+}
+
+/* LOGIN REGISTER PILL */
+
+.tabs{
+display:flex;
+background:linear-gradient(90deg,#7a6ef7,#9c93ff);
+border-radius:40px;
+padding:5px;
+width:260px;
+margin-bottom:30px;
+}
+
+.tab{
+flex:1;
+border:none;
+padding:10px 0;
+border-radius:40px;
+background:transparent;
+color:white;
+font-size:14px;
+cursor:pointer;
+}
+
+.tab.active{
+background:linear-gradient(90deg,#4f46e5,#6d63ff);
+}
+
+/* LABEL */
+
+label{
+font-size:13px;
+color:#444;
+margin-bottom:6px;
+margin-top:8px;
+}
+
+/* INPUTS */
+
+input[type="text"],
+input[type="password"]{
+width:380px;
+padding:14px 18px;
+border-radius:30px;
+border:2px solid #7a6ef7;
+outline:none;
+margin-bottom:16px;
+font-size:14px;
+background:white;
+}
+
+/* GOOGLE BUTTON */
+
+.google{
+width:380px;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+padding:14px;
+border-radius:30px;
+border:2px solid #ccc;
+background:white;
+cursor:pointer;
+margin-bottom:18px;
+}
+
+.googleIcon{
+width:18px;
+height:18px;
+}
+
+/* OPTIONS */
+
+.options{
+width:380px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:13px;
+margin-bottom:25px;
+}
+
+.options input{
+margin-right:6px;
+}
+
+.forgot{
+cursor:pointer;
+color:#555;
+}
+
+/* LOGIN BUTTON */
+
+.loginBtn{
+width:220px;
+padding:14px;
+border:none;
+border-radius:30px;
+background:linear-gradient(90deg,#5a4bff,#8a7cff);
+color:white;
+font-size:14px;
+cursor:pointer;
+}
