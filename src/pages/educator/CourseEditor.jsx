@@ -64,8 +64,8 @@ const CourseEditor = () => {
           <h2>CourseSphere</h2>
           <ul>
             <li onClick={()=>navigate("/educator/dashboard")}>Dashboard</li>
-            <li className="active" onClick={()=>navigate("/educator/mycourses")}>My Courses</li>
-            <li onClick={()=>navigate("/educator/createcourse")}>Create Course</li>
+            <li className="active" onClick={()=>navigate("/educator/courses")}>My Courses</li>
+            <li onClick={()=>navigate("/educator/create-course")}>Create Course</li>
             <li onClick={()=>navigate("/educator/students")}>Students</li>
           </ul>
         </div>
@@ -86,7 +86,7 @@ const CourseEditor = () => {
           <div className="content">
 
             <div className="top-header">
-              <div className="back-btn" onClick={()=>navigate("/educator/mycourses")}>
+              <div className="back-btn" onClick={()=>navigate("/educator/courses")}>
                 <FaArrowLeft/> Back
               </div>
               <h2>Edit Course</h2>

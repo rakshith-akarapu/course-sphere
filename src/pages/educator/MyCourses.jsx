@@ -240,7 +240,7 @@ const MyCourses = () => {
 
             <li
               className="active"
-              onClick={() => navigate("/educator/my-courses")}
+              onClick={() => navigate("/educator/courses")}
             >
               My Courses
             </li>
@@ -250,7 +250,7 @@ const MyCourses = () => {
             </li>
 
             <li>Students</li>
-            <li>Settings</li>
+            <li onClick={() => navigate("/educator/settings")}>Settings</li>
           </ul>
         </div>
 
@@ -279,7 +279,7 @@ const MyCourses = () => {
                 <div
                   key={course.id}
                   className="course-card"
-                  onClick={() => navigate(`/educator/course/${course.id}`)}
+                  onClick={() => navigate(`/educator/course-editor/${course.id}`)}
                 >
                   <img
                     src={course.image}
@@ -308,7 +308,7 @@ const MyCourses = () => {
                 <div
                   key={course.id}
                   className="course-card"
-                  onClick={() => navigate(`/educator/course/${course.id}`)}
+                  onClick={() => navigate(`/educator/course-editor/${course.id}`)}
                 >
                   <img
                     src={course.image}

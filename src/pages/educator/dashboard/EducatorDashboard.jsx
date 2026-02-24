@@ -278,10 +278,10 @@ const EducatorDashboard = () => {
           <h2>CourseSphere</h2>
           <ul>
             <li className="active" onClick={() => navigate("/educator/dashboard")}>Dashboard</li>
-            <li onClick={() => navigate("/educator/mycourses")}>My Courses</li>
-            <li onClick={() => navigate("/educator/createcourse")}>Create Course</li>
-            <li>Students</li>
-            <li>Settings</li>
+            <li onClick={() => navigate("/educator/courses")}>My Courses</li>
+            <li onClick={() => navigate("/educator/create-course")}>Create Course</li>
+            <li onClick={() => navigate("/educator/students")}>Students</li>
+            <li onClick={() => navigate("/educator/settings")}>Settings</li>
           </ul>
         </div>
 

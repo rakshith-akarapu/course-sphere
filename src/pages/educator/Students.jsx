@@ -186,10 +186,10 @@ const Students = () => {
           <h2>CourseSphere</h2>
           <ul>
             <li onClick={() => navigate("/educator/dashboard")}>Dashboard</li>
-            <li onClick={() => navigate("/educator/mycourses")}>My Courses</li>
-            <li onClick={() => navigate("/educator/createcourse")}>Create Course</li>
+            <li onClick={() => navigate("/educator/courses")}>My Courses</li>
+            <li onClick={() => navigate("/educator/create-course")}>Create Course</li>
             <li className="active">Students</li>
-            <li>Settings</li>
+            <li onClick={() => navigate("/educator/settings")}>Settings</li>
           </ul>
         </div>
 

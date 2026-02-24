@@ -24,6 +24,7 @@ import CourseEditor from "./pages/educator/CourseEditor";
 import EducatorMyCourses from "./pages/educator/MyCourses";
 import Students from "./pages/educator/Students";
 import Doubts from "./pages/educator/Doubts";
+import EducatorSettings from "./pages/educator/Settings";
 
 /* ---------------- ROLE PROTECTION ---------------- */
 
@@ -214,6 +215,15 @@ function App() {
           element={
             <RequireRole role="educator">
               <Doubts />
+            </RequireRole>
+          }
+        />
+
+        <Route
+          path="/educator/settings"
+          element={
+            <RequireRole role="educator">
+              <EducatorSettings />
             </RequireRole>
           }
         />
