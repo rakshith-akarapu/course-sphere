@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import { completedCourses, inProgressCourses } from "../data/courses";
@@ -6,6 +6,21 @@ import "../styles/mycourses.css";
 
 function MyCourses() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const query = (searchParams.get("q") || "").trim();
+  const normalizedQuery = query.toLowerCase();
+
+  const matchesQuery = (course) => {
+    if (!normalizedQuery) {
+      return true;
+    }
+    const searchable = `${course.title} ${course.instructor}`.toLowerCase();
+    return searchable.includes(normalizedQuery);
+  };
+
+  const filteredInProgress = inProgressCourses.filter(matchesQuery);
+  const filteredCompleted = completedCourses.filter(matchesQuery);
+  const hasAnyResults = filteredInProgress.length > 0 || filteredCompleted.length > 0;
 
   return (
     <div className="dashboard-layout">
@@ -13,12 +28,13 @@ function MyCourses() {
 
       <div className="dashboard-main mycourses-page">
         <Navbar />
+        {query && <p className="search-context">Showing results for "{query}"</p>}
 
         {/* In Progress */}
         <h2 className="section-title">In Progress</h2>
 
         <div className="course-grid">
-          {inProgressCourses.map((course) => (
+          {filteredInProgress.map((course) => (
             <div
               key={course.id}
               className="course-card"
@@ -53,12 +69,15 @@ function MyCourses() {
             </div>
           ))}
         </div>
+        {filteredInProgress.length === 0 && query && (
+          <p className="empty-state">No in-progress courses matched this search.</p>
+        )}
 
         {/* Completed Courses */}
         <h2 className="section-title">Completed Courses</h2>
 
         <div className="course-grid">
-          {completedCourses.map((course) => (
+          {filteredCompleted.map((course) => (
             <div
               key={course.id}
               className="course-card completed"
@@ -93,6 +112,12 @@ function MyCourses() {
             </div>
           ))}
         </div>
+        {filteredCompleted.length === 0 && query && (
+          <p className="empty-state">No completed courses matched this search.</p>
+        )}
+        {!hasAnyResults && query && (
+          <p className="empty-state">Try another keyword like "AWS" or an instructor name.</p>
+        )}
 
       </div>
     </div>

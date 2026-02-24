@@ -6,6 +6,12 @@
   margin-bottom: 40px;
 }
 
+.explore-page .search-context {
+  margin: 6px 0 12px;
+  color: #6366f1;
+  font-weight: 500;
+}
+
 .explore-page .course-card {
   position: relative;
   background: #ffffff;
@@ -88,4 +94,13 @@
 
 .explore-page .course-card:hover .course-content p {
   color: #0f172a;
+}
+
+.explore-page .empty-state {
+  margin-top: -10px;
+  background: #ffffff;
+  border: 1px dashed #c7d2fe;
+  color: #475569;
+  border-radius: 12px;
+  padding: 14px;
 }
