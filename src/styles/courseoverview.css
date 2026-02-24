@@ -1,0 +1,87 @@
+.overview-banner img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.overview-container {
+  display: flex;
+  gap: 30px;
+}
+
+.overview-left {
+  flex: 2;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.overview-right {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  height: fit-content;
+}
+
+.enroll-btn {
+  width: 100%;
+  padding: 10px;
+  background: #2ecc71;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+/* ===== Banner Section ===== */
+
+.overview-banner {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  margin-bottom: 100px; /* IMPORTANT: prevents overlap */
+}
+
+.banner-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+/* Floating preview */
+.banner-preview {
+  position: absolute;
+  bottom: -50px; /* push below banner */
+  right: 60px;
+  background: white;
+  padding: 12px;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.banner-preview img {
+  width: 280px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+/* Content layout */
+.overview-container {
+  display: flex;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.success-message {
+  color: green;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

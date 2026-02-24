@@ -1,0 +1,128 @@
+.assignments-page-main {
+  padding: 0;
+}
+
+.assignments-page-topbar {
+  height: 70px;
+  background: #f8f9fc;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.assignments-back-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.assignments-back-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.assignments-page-topbar h2 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.assignments-section {
+  padding: 28px 32px;
+}
+
+.assignments-section h1 {
+  margin: 0;
+  font-size: 43px;
+}
+
+.assignments-section p {
+  margin: 8px 0 20px;
+  color: #6b7280;
+}
+
+.assignments-table {
+  display: grid;
+  gap: 8px;
+}
+
+.assignments-row {
+  display: grid;
+  grid-template-columns: minmax(250px, 1.8fr) minmax(200px, 1.4fr) minmax(130px, 1fr) 120px 120px;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.assignments-row-head {
+  font-weight: 600;
+  color: #6b7280;
+  background: #f8f9fc;
+}
+
+.assignments-row:not(.assignments-row-head):hover {
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-pill.done {
+  background: #d9f5e2;
+  color: #1f9d3a;
+}
+
+.status-pill.pending {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.submitted-text {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.upload-link-btn {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.upload-link-btn:hover {
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1100px) {
+  .assignments-table {
+    overflow-x: auto;
+  }
+
+  .assignments-row {
+    min-width: 900px;
+  }
+}
