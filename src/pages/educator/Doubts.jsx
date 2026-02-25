@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaBell, FaUserCircle } from "react-icons/fa";
+import { clearCurrentUser } from "../../utils/auth";
 
 const Doubts = () => {
 
   const navigate = useNavigate();
+  const handleLogout = () => {
+    clearCurrentUser();
+    navigate("/");
+  };
 
   const [replies, setReplies] = useState({});
 
@@ -80,6 +85,22 @@ const Doubts = () => {
         display:flex;
         align-items:center;
         gap:25px;
+      }
+
+      .logout-btn{
+        border:none;
+        padding:9px 16px;
+        border-radius:999px;
+        background:linear-gradient(90deg, #5f5bd6, #7a77e6);
+        color:#fff;
+        cursor:pointer;
+        font-weight:600;
+        transition:transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .logout-btn:hover{
+        transform:translateY(-1px);
+        box-shadow:0 10px 20px rgba(95, 91, 214, 0.3);
       }
 
       /* CONTENT */
@@ -161,6 +182,7 @@ const Doubts = () => {
         <div className="nav-right">
           <FaBell />
           <FaUserCircle size={26}/>
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
 
       </div>

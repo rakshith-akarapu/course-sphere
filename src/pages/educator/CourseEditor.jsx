@@ -9,10 +9,15 @@ import {
   FaQuestionCircle,
   FaClipboardList
 } from "react-icons/fa";
+import { clearCurrentUser } from "../../utils/auth";
 
 const CourseEditor = () => {
 
   const navigate = useNavigate();
+  const handleLogout = () => {
+    clearCurrentUser();
+    navigate("/");
+  };
   const [activeTab, setActiveTab] = useState("description");
   const [activeLesson, setActiveLesson] = useState(0);
 
@@ -39,6 +44,8 @@ const CourseEditor = () => {
         .search-container:focus-within { background:#fff; border:1px solid #6c63ff; }
         .search-container input { border:none; background:transparent; outline:none; width:100%; }
         .nav-right { display:flex; gap:30px; align-items:center; }
+        .logout-btn { border:none; padding:9px 16px; border-radius:999px; background:linear-gradient(90deg,#5f5bd6,#7a77e6); color:#fff; cursor:pointer; font-weight:600; transition:transform 0.2s ease, box-shadow 0.2s ease; }
+        .logout-btn:hover { transform:translateY(-1px); box-shadow:0 10px 20px rgba(95,91,214,0.3); }
         .content { padding:30px 50px; }
         .top-header { display:flex; align-items:center; gap:20px; margin-bottom:25px; }
         .back-btn { cursor:pointer; color:#6c63ff; display:flex; align-items:center; gap:8px; }
@@ -84,6 +91,7 @@ const CourseEditor = () => {
             <div className="nav-right">
               <FaBell/>
               <FaUserCircle size={26}/>
+              <button className="logout-btn" onClick={handleLogout}>Logout</button>
             </div>
           </div>
 

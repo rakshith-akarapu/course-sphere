@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBell, FaUserCircle, FaSearch } from "react-icons/fa";
-import { getCurrentUser, setCurrentUser } from "../../utils/auth";
+import { clearCurrentUser, getCurrentUser, setCurrentUser } from "../../utils/auth";
 
 const EducatorSettings = () => {
   const navigate = useNavigate();
   const user = getCurrentUser();
+  const handleLogout = () => {
+    clearCurrentUser();
+    navigate("/");
+  };
 
   const [fullName, setFullName] = useState(user?.name || "Educator");
   const [email, setEmail] = useState(user?.email || "");
@@ -44,6 +48,8 @@ const EducatorSettings = () => {
         .search-container:focus-within { background: #fff; border: 1px solid #6c63ff; }
         .search-container input { border: none; background: transparent; outline: none; width: 100%; }
         .nav-right { display: flex; align-items: center; gap: 30px; }
+        .logout-btn { border: none; padding: 9px 16px; border-radius: 999px; background: linear-gradient(90deg, #5f5bd6, #7a77e6); color: #fff; cursor: pointer; font-weight: 600; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .logout-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(95, 91, 214, 0.3); }
         .content { padding: 32px 40px; }
         .card { background: white; border-radius: 14px; padding: 26px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); max-width: 760px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,0.08); }
@@ -80,6 +86,7 @@ const EducatorSettings = () => {
             <div className="nav-right">
               <FaBell />
               <FaUserCircle size={26} />
+              <button className="logout-btn" onClick={handleLogout}>Logout</button>
             </div>
           </div>
 
