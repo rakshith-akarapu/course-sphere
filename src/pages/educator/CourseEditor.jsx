@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   FaArrowLeft,
   FaSave,
-  FaBell,
   FaUserCircle,
-  FaSearch,
   FaQuestionCircle,
   FaClipboardList
 } from "react-icons/fa";
@@ -14,10 +12,16 @@ import { clearCurrentUser } from "../../utils/auth";
 const CourseEditor = () => {
 
   const navigate = useNavigate();
+
   const handleLogout = () => {
     clearCurrentUser();
     navigate("/");
   };
+
+  const goToSettings = () => {
+    navigate("/educator/settings");
+  };
+
   const [activeTab, setActiveTab] = useState("description");
   const [activeLesson, setActiveLesson] = useState(0);
 
@@ -31,41 +35,227 @@ const CourseEditor = () => {
   return (
     <>
       <style>{`
-        * { font-family: "Poppins", sans-serif; box-sizing: border-box; margin:0; padding:0; }
-        .dashboard { display:flex; background:#f4f6fb; min-height:100vh; }
-        .sidebar { width:230px; background:white; padding:30px 20px; border-right:1px solid #eee; }
-        .sidebar h2 { color:#6c63ff; margin-bottom:35px; }
-        .sidebar li { list-style:none; padding:12px; margin-bottom:12px; border-radius:8px; cursor:pointer; font-size:14px; transition:0.25s ease; }
-        .sidebar li:hover { background:#f1f1ff; transform:translateX(4px); }
-        .sidebar li.active { background:#6c63ff; color:white; box-shadow:0 10px 20px rgba(108, 99, 255, 0.28); }
-        .main { flex:1; display:flex; flex-direction:column; }
-        .topbar { background:white; padding:15px 35px; display:flex; justify-content:space-between; border-bottom:1px solid #eee; }
-        .search-container { display:flex; align-items:center; background:#f4f6fb; padding:8px 15px; border-radius:8px; width:250px; gap:10px; transition:0.2s ease; }
-        .search-container:focus-within { background:#fff; border:1px solid #6c63ff; }
-        .search-container input { border:none; background:transparent; outline:none; width:100%; }
-        .nav-right { display:flex; gap:30px; align-items:center; }
-        .logout-btn { border:none; padding:9px 16px; border-radius:999px; background:linear-gradient(90deg,#5f5bd6,#7a77e6); color:#fff; cursor:pointer; font-weight:600; transition:transform 0.2s ease, box-shadow 0.2s ease; }
-        .logout-btn:hover { transform:translateY(-1px); box-shadow:0 10px 20px rgba(95,91,214,0.3); }
-        .content { padding:30px 50px; }
-        .top-header { display:flex; align-items:center; gap:20px; margin-bottom:25px; }
-        .back-btn { cursor:pointer; color:#6c63ff; display:flex; align-items:center; gap:8px; }
-        .editor-layout { display:grid; grid-template-columns:2fr 1fr; gap:30px; }
-        .video-section { background:white; border-radius:18px; overflow:hidden; box-shadow:0 12px 30px rgba(0,0,0,0.05); transition:transform 0.25s ease, box-shadow 0.25s ease; }
-        .video-section:hover { transform:translateY(-2px); box-shadow:0 18px 36px rgba(0,0,0,0.08); }
-        .video-wrapper { position:relative; width:100%; padding-top:56.25%; }
-        .video-wrapper iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; }
-        .course-title { font-size:20px; font-weight:600; padding:20px; }
-        .tabs { display:flex; gap:20px; padding:12px 25px; background:linear-gradient(90deg,#6c63ff,#8b7cff); border-radius:50px; width:fit-content; margin:20px 25px; }
-        .tab { padding:8px 16px; font-size:14px; cursor:pointer; color:white; opacity:0.8; }
-        .tab.active { background:rgba(255,255,255,0.25); border-radius:25px; opacity:1; }
-        .tab-content { padding:25px; }
-        textarea, input { width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-top:10px; }
-        .action-wrapper { margin-top:30px; display:flex; justify-content:flex-end; gap:15px; }
-        .btn { padding:12px 20px; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:8px; font-weight:600; color:white; transition:0.2s ease; }
-        .btn:hover { transform:translateY(-1px); filter:brightness(0.96); }
+        * { 
+          font-family: "Poppins", sans-serif; 
+          box-sizing: border-box; 
+          margin:0; 
+          padding:0; 
+        }
+
+        .dashboard { 
+          display:flex; 
+          background:#f4f6fb; 
+          min-height:100vh; 
+        }
+
+        .sidebar {
+          width:230px;
+          background:white;
+          padding:30px 20px;
+          border-right:1px solid #eee;
+        }
+
+        .sidebar h2 { 
+          color:#6c63ff; 
+          margin-bottom:35px; 
+        }
+
+        .sidebar li {
+          list-style:none;
+          padding:12px;
+          margin-bottom:12px;
+          border-radius:8px;
+          cursor:pointer;
+          font-size:14px;
+          transition:0.25s ease;
+        }
+
+        .sidebar li:hover {
+          background:#f1f1ff;
+          transform:translateX(4px);
+        }
+
+        .sidebar li.active {
+          background:#6c63ff;
+          color:white;
+          box-shadow:0 10px 20px rgba(108, 99, 255, 0.28);
+        }
+
+        .main { 
+          flex:1; 
+          display:flex; 
+          flex-direction:column; 
+        }
+
+        /* UPDATED NAVBAR */
+
+        .topbar {
+          background: white;
+          padding: 10px 30px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          border-bottom: 1px solid #eee;
+        }
+
+        .nav-right {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .profile-icon {
+          color: #555;
+          cursor: pointer;
+          transition: 0.25s ease;
+        }
+
+        .profile-icon:hover {
+          color: #6c63ff;
+          transform: scale(1.1);
+        }
+
+        .logout-btn {
+          border:none;
+          padding:6px 16px;
+          border-radius:999px;
+          background:linear-gradient(90deg,#6c63ff,#8b7cff);
+          color:#fff;
+          cursor:pointer;
+          font-weight:600;
+          transition:0.2s ease;
+        }
+
+        .logout-btn:hover {
+          transform:translateY(-1px);
+          box-shadow:0 8px 18px rgba(108,99,255,0.25);
+        }
+
+        .content { 
+          padding:30px 50px; 
+        }
+
+        .back-button {
+          display:inline-flex;
+          align-items:center;
+          gap:8px;
+          padding:10px 18px;
+          border-radius:8px;
+          border:1px solid #6c63ff;
+          background:white;
+          color:#6c63ff;
+          font-weight:600;
+          cursor:pointer;
+          transition:0.25s ease;
+          margin-bottom:15px;
+        }
+
+        .back-button:hover {
+          background:#6c63ff;
+          color:white;
+          transform:translateY(-1px);
+          box-shadow:0 8px 18px rgba(108,99,255,0.25);
+        }
+
+        .page-title {
+          font-size:24px;
+          font-weight:600;
+          margin-bottom:25px;
+        }
+
+        .editor-layout {
+          display:grid;
+          grid-template-columns:2fr 1fr;
+          gap:30px;
+        }
+
+        .video-section {
+          background:white;
+          border-radius:18px;
+          overflow:hidden;
+          box-shadow:0 12px 30px rgba(0,0,0,0.05);
+        }
+
+        .video-wrapper {
+          position:relative;
+          width:100%;
+          padding-top:56.25%;
+        }
+
+        .video-wrapper iframe {
+          position:absolute;
+          top:0;
+          left:0;
+          width:100%;
+          height:100%;
+          border:none;
+        }
+
+        .course-title {
+          font-size:20px;
+          font-weight:600;
+          padding:20px;
+        }
+
+        .tabs {
+          display:flex;
+          gap:20px;
+          padding:12px 25px;
+          background:linear-gradient(90deg,#6c63ff,#8b7cff);
+          border-radius:50px;
+          width:fit-content;
+          margin:20px 25px;
+        }
+
+        .tab {
+          padding:8px 16px;
+          font-size:14px;
+          cursor:pointer;
+          color:white;
+          opacity:0.8;
+        }
+
+        .tab.active {
+          background:rgba(255,255,255,0.25);
+          border-radius:25px;
+          opacity:1;
+        }
+
+        .tab-content { 
+          padding:25px; 
+        }
+
+        textarea, input {
+          width:100%;
+          padding:10px;
+          border-radius:8px;
+          border:1px solid #ddd;
+          margin-top:10px;
+        }
+
+        .action-wrapper {
+          margin-top:30px;
+          display:flex;
+          justify-content:flex-end;
+          gap:15px;
+        }
+
+        .btn {
+          padding:12px 20px;
+          border:none;
+          border-radius:8px;
+          cursor:pointer;
+          display:flex;
+          align-items:center;
+          gap:8px;
+          font-weight:600;
+          color:white;
+        }
+
         .save { background:#6c63ff; }
         .doubt { background:#00b894; }
         .assign { background:#0984e3; }
+
       `}</style>
 
       <div className="dashboard">
@@ -83,43 +273,53 @@ const CourseEditor = () => {
 
         <div className="main">
 
+          {/* UPDATED NAVBAR */}
           <div className="topbar">
-            <div className="search-container">
-              <FaSearch/>
-              <input placeholder="Search..." />
-            </div>
             <div className="nav-right">
-              <FaBell/>
-              <FaUserCircle size={26}/>
-              <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              <FaUserCircle
+                size={24}
+                className="profile-icon"
+                onClick={goToSettings}
+              />
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           </div>
 
           <div className="content">
 
-            <div className="top-header">
-              <div className="back-btn" onClick={()=>navigate("/educator/courses")}>
-                <FaArrowLeft/> Back
-              </div>
-              <h2>Edit Course</h2>
-            </div>
+            <button
+              className="back-button"
+              onClick={()=>navigate("/educator/courses")}
+            >
+              <FaArrowLeft/> Back to Courses
+            </button>
+
+            <div className="page-title">Edit Course</div>
 
             <div className="editor-layout">
 
               <div>
                 <div className="video-section">
-
                   <div className="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/iYKl_Sri3pE" title="Lecture"/>
+                    <iframe 
+                      src="https://www.youtube.com/embed/iYKl_Sri3pE" 
+                      title="Lecture"
+                    />
                   </div>
 
-                  <div className="course-title">{lessons[activeLesson]}</div>
+                  <div className="course-title">
+                    {lessons[activeLesson]}
+                  </div>
 
                   <div className="tabs">
                     {["description","notes","files"].map(tab=>(
-                      <div key={tab}
+                      <div
+                        key={tab}
                         className={`tab ${activeTab===tab?"active":""}`}
-                        onClick={()=>setActiveTab(tab)}>
+                        onClick={()=>setActiveTab(tab)}
+                      >
                         {tab.toUpperCase()}
                       </div>
                     ))}
@@ -130,7 +330,6 @@ const CourseEditor = () => {
                     {activeTab==="notes" && <textarea defaultValue="Lecture notes here..." />}
                     {activeTab==="files" && <input type="file" multiple />}
                   </div>
-
                 </div>
 
                 <div className="action-wrapper">
@@ -143,8 +342,18 @@ const CourseEditor = () => {
               <div style={{background:"white",padding:"20px",borderRadius:"18px"}}>
                 <h3>Course Contents</h3>
                 {lessons.map((lesson,i)=>(
-                  <div key={i} style={{padding:"10px",cursor:"pointer",background:i===activeLesson?"#6c63ff":"#f1f1ff",color:i===activeLesson?"white":"black",borderRadius:"8px",marginBottom:"10px"}}
-                    onClick={()=>setActiveLesson(i)}>
+                  <div
+                    key={i}
+                    style={{
+                      padding:"10px",
+                      cursor:"pointer",
+                      background:i===activeLesson?"#6c63ff":"#f1f1ff",
+                      color:i===activeLesson?"white":"black",
+                      borderRadius:"8px",
+                      marginBottom:"10px"
+                    }}
+                    onClick={()=>setActiveLesson(i)}
+                  >
                     {lesson}
                   </div>
                 ))}

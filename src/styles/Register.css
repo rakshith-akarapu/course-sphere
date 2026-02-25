@@ -1,0 +1,120 @@
+/* RESET */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+html, body {
+  height:100%;
+  overflow-x:hidden;
+}
+
+/* MAIN CONTAINER */
+.register{
+  display:flex;
+  min-height:100vh;              /* changed from height */
+  align-items:center;            /* vertical center */
+  justify-content:space-between;
+  background:#f3f3f3;
+  padding:40px 60px;             /* better spacing */
+  overflow:hidden;
+}
+
+/* LEFT SIDE */
+.left{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding-left:80px;             /* reduced from 120 (caused overflow) */
+}
+
+/* LOGO */
+.logo{
+  font-size:26px;
+  font-weight:600;
+  color:#555;
+  margin-bottom:40px;
+}
+
+/* MAIN HEADING */
+.left h2{
+  font-size:42px;
+  font-weight:700;
+  margin-bottom:15px;
+}
+
+/* SUB TEXT */
+.left p{
+  color:#8a8a8a;
+  font-size:18px;
+  margin-bottom:30px;
+  line-height:1.5;
+}
+
+/* TABS */
+.tabs{
+  display:flex;
+  background:linear-gradient(90deg,#7a6ef7,#9c93ff);
+  border-radius:40px;
+  padding:5px;
+  width:260px;
+  margin-bottom:25px;
+}
+
+.tab{
+  flex:1;
+  border:none;
+  padding:10px 0;
+  border-radius:40px;
+  background:transparent;
+  color:white;
+  font-size:14px;
+  cursor:pointer;
+  transition:0.2s ease;
+}
+
+.tab.active{
+  background:linear-gradient(90deg,#4f46e5,#6d63ff);
+}
+
+/* SELECTION BOXES */
+.box{
+  width:420px;
+  max-width:100%;          /* prevents overflow */
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:12px;
+  border:1px solid #d4d9f7;
+  background:#e9edff;
+  text-align:left;
+  font-size:16px;
+  font-weight:500;
+  color:#2f3a8f;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  transition:0.2s ease;
+}
+
+.box:hover{
+  background:#dfe5ff;
+}
+
+/* RIGHT SIDE */
+.right{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* IMAGE */
+.image{
+  width:100%;
+  max-width:800px;    /* keeps your 600px limit */
+  height:auto;
+}

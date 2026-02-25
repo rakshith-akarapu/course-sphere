@@ -1,17 +1,19 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FaBell,
-  FaUserCircle,
-  FaSearch
-} from "react-icons/fa";
+import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { clearCurrentUser } from "../../utils/auth";
 
 const MyCourses = () => {
+
   const navigate = useNavigate();
+
   const handleLogout = () => {
     clearCurrentUser();
     navigate("/");
+  };
+
+  const goToSettings = () => {
+    navigate("/educator/settings");
   };
 
   const activeCourses = [
@@ -53,12 +55,6 @@ const MyCourses = () => {
       title: "React JS Bootcamp",
       instructor: "Ankit Verma",
       image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085"
-    },
-    {
-      id: 7,
-      title: "Cybersecurity Fundamentals",
-      instructor: "Neha Singh",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"
     }
   ];
 
@@ -75,14 +71,14 @@ const MyCourses = () => {
 
         .dashboard {
           display: flex;
-          background: #f4f6fb;
+          background: #f6f7fb;
           min-height: 100vh;
         }
 
         /* SIDEBAR */
 
         .sidebar {
-          width: 230px;
+          width: 240px;
           background: white;
           padding: 30px 20px;
           border-right: 1px solid #eee;
@@ -90,14 +86,15 @@ const MyCourses = () => {
 
         .sidebar h2 {
           color: #6c63ff;
-          margin-bottom: 35px;
+          margin-bottom: 40px;
+          font-weight: 600;
         }
 
         .sidebar li {
           list-style: none;
           padding: 12px;
           margin-bottom: 12px;
-          border-radius: 8px;
+          border-radius: 10px;
           cursor: pointer;
           font-size: 14px;
           transition: 0.25s ease;
@@ -109,12 +106,10 @@ const MyCourses = () => {
         }
 
         .sidebar li.active {
-          background: #6c63ff;
+          background: linear-gradient(90deg,#6c63ff,#8b7cff);
           color: white;
-          box-shadow: 0 10px 20px rgba(108, 99, 255, 0.28);
+          box-shadow: 0 8px 18px rgba(108,99,255,0.3);
         }
-
-        /* MAIN */
 
         .main {
           flex: 1;
@@ -122,31 +117,32 @@ const MyCourses = () => {
           flex-direction: column;
         }
 
-        /* TOP NAV */
+        /* UPDATED NAVBAR (same as Code 2) */
 
         .topbar {
           background: white;
-          padding: 15px 35px;
+         
+  padding: 10px 30px;   
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid #f0f0f0;
         }
 
         .search-container {
           display: flex;
           align-items: center;
-          background: #f4f6fb;
-          padding: 8px 15px;
-          border-radius: 8px;
-          width: 300px;
+          background: #f4f6ff;
+          padding: 10px 16px;
+          border-radius: 30px;
+          width: 260px;
           gap: 10px;
-          transition: 0.2s ease;
+          transition: 0.25s ease;
         }
 
         .search-container:focus-within {
-          background: white;
-          border: 1px solid #6c63ff;
+          background: #fff;
+          box-shadow: 0 0 0 2px rgba(108,99,255,0.15);
         }
 
         .search-container input {
@@ -159,75 +155,83 @@ const MyCourses = () => {
         .nav-right {
           display: flex;
           align-items: center;
-          gap: 30px;
+          gap: 20px;
+        }
+
+        .profile-icon {
+          cursor: pointer;
+          color: #555;
+          transition: 0.25s ease;
+        }
+
+        .profile-icon:hover {
+          color: #6c63ff;
+          transform: scale(1.1);
         }
 
         .logout-btn {
           border: none;
-          padding: 9px 16px;
+          padding: 8px 18px;
           border-radius: 999px;
-          background: linear-gradient(90deg, #5f5bd6, #7a77e6);
-          color: #fff;
+          background: linear-gradient(90deg,#6c63ff,#8b7cff);
+          color: white;
           cursor: pointer;
           font-weight: 600;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          transition: 0.2s ease;
         }
 
         .logout-btn:hover {
           transform: translateY(-1px);
-          box-shadow: 0 10px 20px rgba(95, 91, 214, 0.3);
+          box-shadow: 0 10px 20px rgba(108,99,255,0.25);
         }
+
+        /* CONTENT */
 
         .content {
-          padding: 35px;
+          padding: 40px 60px 60px 60px;
         }
 
-        h2.section-title {
-          margin-bottom: 20px;
+        .section-title {
+          font-size: 22px;
+          margin-bottom: 25px;
+          font-weight: 600;
         }
-
-        /* COURSE GRID */
 
         .course-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 25px;
-          margin-bottom: 50px;
+          grid-template-columns: repeat(3, 320px);
+          gap: 40px;
+          margin-bottom: 70px;
         }
 
         .course-card {
           background: white;
           border-radius: 18px;
           overflow: hidden;
-          box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+          transition: 0.3s ease;
           cursor: pointer;
         }
 
         .course-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+          transform: translateY(-6px);
+          box-shadow: 0 18px 35px rgba(0,0,0,0.08);
         }
 
         .course-image {
           width: 100%;
-          height: 180px;
+          height: 190px;
           object-fit: cover;
-          transition: transform 0.35s ease;
-        }
-
-        .course-card:hover .course-image {
-          transform: scale(1.05);
         }
 
         .course-body {
-          padding: 18px;
+          padding: 20px;
         }
 
         .course-title {
-          font-size: 15px;
+          font-size: 16px;
           font-weight: 600;
-          margin-bottom: 8px;
+          margin-bottom: 10px;
         }
 
         .instructor-row {
@@ -238,7 +242,7 @@ const MyCourses = () => {
         }
 
         .badge {
-          padding: 5px 12px;
+          padding: 6px 14px;
           border-radius: 20px;
           font-size: 11px;
           font-weight: 600;
@@ -258,34 +262,19 @@ const MyCourses = () => {
 
       <div className="dashboard">
 
-        {/* SIDEBAR */}
         <div className="sidebar">
           <h2>CourseSphere</h2>
           <ul>
-            <li onClick={() => navigate("/educator/dashboard")}>
-              Dashboard
-            </li>
-
-            <li
-              className="active"
-              onClick={() => navigate("/educator/courses")}
-            >
-              My Courses
-            </li>
-
-            <li onClick={() => navigate("/educator/create-course")}>
-              Create Course
-            </li>
-
+            <li onClick={() => navigate("/educator/dashboard")}>Dashboard</li>
+            <li className="active">My Courses</li>
+            <li onClick={() => navigate("/educator/create-course")}>Create Course</li>
             <li onClick={() => navigate("/educator/students")}>Students</li>
             <li onClick={() => navigate("/educator/settings")}>Settings</li>
           </ul>
         </div>
 
-        {/* MAIN */}
         <div className="main">
 
-          {/* TOPBAR */}
           <div className="topbar">
             <div className="search-container">
               <FaSearch />
@@ -293,15 +282,20 @@ const MyCourses = () => {
             </div>
 
             <div className="nav-right">
-              <FaBell />
-              <FaUserCircle size={26} />
-              <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              <FaUserCircle
+                size={26}
+                className="profile-icon"
+                onClick={goToSettings}
+              />
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           </div>
 
           <div className="content">
 
-            <h2 className="section-title">Active</h2>
+            <div className="section-title">Active</div>
 
             <div className="course-grid">
               {activeCourses.map(course => (
@@ -310,27 +304,19 @@ const MyCourses = () => {
                   className="course-card"
                   onClick={() => navigate(`/educator/course-editor/${course.id}`)}
                 >
-                  <img
-                    src={course.image}
-                    className="course-image"
-                    alt={course.title}
-                  />
-
+                  <img src={course.image} className="course-image" alt={course.title}/>
                   <div className="course-body">
                     <div className="course-title">{course.title}</div>
-
                     <div className="instructor-row">
                       <span>{course.instructor}</span>
-                      <span className="badge progress-badge">
-                        In Progress
-                      </span>
+                      <span className="badge progress-badge">In Progress</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <h2 className="section-title">Previous</h2>
+            <div className="section-title">Previous</div>
 
             <div className="course-grid">
               {previousCourses.map(course => (
@@ -339,20 +325,12 @@ const MyCourses = () => {
                   className="course-card"
                   onClick={() => navigate(`/educator/course-editor/${course.id}`)}
                 >
-                  <img
-                    src={course.image}
-                    className="course-image"
-                    alt={course.title}
-                  />
-
+                  <img src={course.image} className="course-image" alt={course.title}/>
                   <div className="course-body">
                     <div className="course-title">{course.title}</div>
-
                     <div className="instructor-row">
                       <span>{course.instructor}</span>
-                      <span className="badge completed-badge">
-                        Completed
-                      </span>
+                      <span className="badge completed-badge">Completed</span>
                     </div>
                   </div>
                 </div>

@@ -1,18 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FaBell,
   FaUserCircle,
-  FaSearch
+  FaDownload
 } from "react-icons/fa";
 import { clearCurrentUser } from "../../utils/auth";
 
 const Students = () => {
 
   const navigate = useNavigate();
+
   const handleLogout = () => {
     clearCurrentUser();
     navigate("/");
+  };
+
+  const goToSettings = () => {
+    navigate("/educator/settings");
   };
 
   const [selectedCourse, setSelectedCourse] = useState("All");
@@ -33,219 +37,253 @@ const Students = () => {
       ? studentsData
       : studentsData.filter(s => s.course === selectedCourse);
 
+  const downloadCSV = () => {
+    const headers = ["Name", "Course", "Course Code", "Progress (%)"];
+
+    const rows = filteredStudents.map(student => [
+      student.name,
+      student.course,
+      student.code,
+      student.progress
+    ]);
+
+    let csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers, ...rows]
+        .map(row => row.join(","))
+        .join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `students_${selectedCourse === "All" ? "all" : selectedCourse}.csv`
+    );
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <>
       <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          font-family: "Poppins", sans-serif;
+
+        * { 
+          margin:0; 
+          padding:0; 
+          box-sizing:border-box; 
+          font-family:"Poppins", sans-serif; 
         }
 
-        .dashboard {
-          display: flex;
-          background: #f4f6fb;
-          min-height: 100vh;
+        .dashboard { 
+          display:flex; 
+          background:#f4f6fb; 
+          min-height:100vh; 
         }
 
-        /* SIDEBAR */
         .sidebar {
-          width: 230px;
-          background: white;
-          padding: 30px 20px;
-          border-right: 1px solid #eee;
+          width:230px;
+          background:white;
+          padding:30px 20px;
+          border-right:1px solid #eee;
         }
 
-        .sidebar h2 {
-          color: #6c63ff;
-          margin-bottom: 35px;
+        .sidebar h2 { 
+          color:#6c63ff; 
+          margin-bottom:35px; 
         }
 
         .sidebar li {
-          list-style: none;
-          padding: 12px;
-          margin-bottom: 12px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 14px;
-          transition: 0.25s ease;
+          list-style:none;
+          padding:12px;
+          margin-bottom:12px;
+          border-radius:8px;
+          cursor:pointer;
+          font-size:14px;
+          transition:0.25s ease;
         }
 
-        .sidebar li:hover {
-          background: #f1f1ff;
-          transform: translateX(4px);
+        .sidebar li:hover { 
+          background:#f1f1ff; 
+          transform:translateX(4px); 
         }
 
         .sidebar li.active {
-          background: #6c63ff;
-          color: white;
-          box-shadow: 0 10px 20px rgba(108, 99, 255, 0.28);
+          background:#6c63ff;
+          color:white;
+          box-shadow:0 10px 20px rgba(108,99,255,0.28);
         }
 
-        /* MAIN */
-        .main {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
+        .main { 
+          flex:1; 
+          display:flex; 
+          flex-direction:column; 
         }
 
-        /* TOPBAR */
+        /* UPDATED NAVBAR */
+
         .topbar {
-          background: white;
-          padding: 15px 35px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-bottom: 1px solid #eee;
-        }
-
-        .search-container {
-          display: flex;
-          align-items: center;
-          background: #f4f6fb;
-          padding: 8px 15px;
-          border-radius: 8px;
-          width: 250px;
-          gap: 10px;
-          transition: 0.2s ease;
-        }
-
-        .search-container:focus-within {
-          background: #fff;
-          border: 1px solid #6c63ff;
-        }
-
-        .search-container input {
-          border: none;
-          background: transparent;
-          outline: none;
-          width: 100%;
+          background:white;
+          padding:10px 30px;
+          display:flex;
+          justify-content:flex-end;
+          align-items:center;
+          border-bottom:1px solid #eee;
         }
 
         .nav-right {
-          display: flex;
-          align-items: center;
-          gap: 30px;
+          display:flex;
+          align-items:center;
+          gap:20px;
+        }
+
+        .profile-icon {
+          color:#555;
+          cursor:pointer;
+          transition:0.25s ease;
+        }
+
+        .profile-icon:hover {
+          color:#6c63ff;
+          transform:scale(1.1);
         }
 
         .logout-btn {
-          border: none;
-          padding: 9px 16px;
-          border-radius: 999px;
-          background: linear-gradient(90deg, #5f5bd6, #7a77e6);
-          color: #fff;
-          cursor: pointer;
-          font-weight: 600;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          border:none;
+          padding:6px 16px;
+          border-radius:999px;
+          background:linear-gradient(90deg,#6c63ff,#8b7cff);
+          color:#fff;
+          cursor:pointer;
+          font-weight:600;
+          transition:0.2s ease;
         }
 
         .logout-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 10px 20px rgba(95, 91, 214, 0.3);
+          transform:translateY(-1px);
+          box-shadow:0 8px 18px rgba(108,99,255,0.25);
         }
 
-        /* CONTENT */
-        .content {
-          padding: 30px 40px;
+        .content { 
+          padding:30px 40px; 
         }
 
         .card {
-          background: white;
-          padding: 25px;
-          border-radius: 16px;
-          box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 14px 28px rgba(0,0,0,0.08);
+          background:white;
+          padding:25px;
+          border-radius:16px;
+          box-shadow:0 8px 25px rgba(0,0,0,0.05);
         }
 
         .card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          margin-bottom:20px;
+        }
+
+        .header-right {
+          display:flex;
+          gap:15px;
+          align-items:center;
         }
 
         .dropdown {
-          padding: 8px 12px;
-          border-radius: 8px;
-          border: 1px solid #ddd;
+          padding:8px 12px;
+          border-radius:8px;
+          border:1px solid #ddd;
+        }
+
+        .download-btn {
+          display:flex;
+          align-items:center;
+          gap:8px;
+          padding:8px 14px;
+          border:none;
+          border-radius:8px;
+          background:linear-gradient(90deg,#6c63ff,#8b7cff);
+          color:white;
+          cursor:pointer;
+          font-weight:500;
+          transition:0.25s ease;
+        }
+
+        .download-btn:hover {
+          transform:translateY(-2px);
+          box-shadow:0 8px 18px rgba(108,99,255,0.3);
         }
 
         table {
-          width: 100%;
-          border-collapse: collapse;
+          width:100%;
+          border-collapse:collapse;
         }
 
         th, td {
-          text-align: left;
-          padding: 12px;
-          border-bottom: 1px solid #eee;
-          font-size: 14px;
+          text-align:left;
+          padding:12px;
+          border-bottom:1px solid #eee;
+          font-size:14px;
         }
 
-        tbody tr:hover {
-          background: #f8faff;
+        th { 
+          font-weight:600; 
+          color:#555; 
         }
 
-        th {
-          font-weight: 600;
-          color: #555;
+        tbody tr:hover { 
+          background:#f8faff; 
         }
 
         .progress-bar {
-          background: #eee;
-          border-radius: 8px;
-          height: 8px;
-          overflow: hidden;
+          background:#eee;
+          border-radius:8px;
+          height:8px;
+          overflow:hidden;
+          margin-top:5px;
         }
 
         .progress-fill {
-          height: 100%;
-          background: #6c63ff;
+          height:100%;
+          background:#6c63ff;
         }
 
         .total {
-          margin-top: 15px;
-          text-align: right;
-          font-weight: 500;
-          color: #555;
+          margin-top:15px;
+          text-align:right;
+          font-weight:500;
+          color:#555;
         }
 
       `}</style>
 
       <div className="dashboard">
 
-        {/* SIDEBAR */}
         <div className="sidebar">
           <h2>CourseSphere</h2>
           <ul>
-            <li onClick={() => navigate("/educator/dashboard")}>Dashboard</li>
-            <li onClick={() => navigate("/educator/courses")}>My Courses</li>
-            <li onClick={() => navigate("/educator/create-course")}>Create Course</li>
+            <li onClick={()=>navigate("/educator/dashboard")}>Dashboard</li>
+            <li onClick={()=>navigate("/educator/courses")}>My Courses</li>
+            <li onClick={()=>navigate("/educator/create-course")}>Create Course</li>
             <li className="active">Students</li>
-            <li onClick={() => navigate("/educator/settings")}>Settings</li>
+            <li onClick={()=>navigate("/educator/settings")}>Settings</li>
           </ul>
         </div>
 
-        {/* MAIN */}
         <div className="main">
 
-          {/* TOPBAR */}
           <div className="topbar">
-            <div className="search-container">
-              <FaSearch />
-              <input type="text" placeholder="Search..." />
-            </div>
-
             <div className="nav-right">
-              <FaBell />
-              <FaUserCircle size={26} />
-              <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              <FaUserCircle
+                size={24}
+                className="profile-icon"
+                onClick={goToSettings}
+              />
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           </div>
 
@@ -256,17 +294,25 @@ const Students = () => {
               <div className="card-header">
                 <h3>Student Details</h3>
 
-                <select
-                  className="dropdown"
-                  value={selectedCourse}
-                  onChange={(e) => setSelectedCourse(e.target.value)}
-                >
-                  {courses.map((course, index) => (
-                    <option key={index} value={course}>
-                      {course}
-                    </option>
-                  ))}
-                </select>
+                <div className="header-right">
+                  <select
+                    className="dropdown"
+                    value={selectedCourse}
+                    onChange={(e)=>setSelectedCourse(e.target.value)}
+                  >
+                    {courses.map((course,index)=>(
+                      <option key={index} value={course}>{course}</option>
+                    ))}
+                  </select>
+
+                  <button
+                    className="download-btn"
+                    onClick={downloadCSV}
+                  >
+                    <FaDownload size={14}/>
+                    Download CSV
+                  </button>
+                </div>
               </div>
 
               <table>
@@ -280,7 +326,7 @@ const Students = () => {
                 </thead>
 
                 <tbody>
-                  {filteredStudents.map((student, index) => (
+                  {filteredStudents.map((student,index)=>(
                     <tr key={index}>
                       <td>{student.name}</td>
                       <td>{student.course}</td>
@@ -290,7 +336,7 @@ const Students = () => {
                         <div className="progress-bar">
                           <div
                             className="progress-fill"
-                            style={{ width: `${student.progress}%` }}
+                            style={{width:`${student.progress}%`}}
                           ></div>
                         </div>
                       </td>
@@ -307,7 +353,6 @@ const Students = () => {
 
           </div>
         </div>
-
       </div>
     </>
   );

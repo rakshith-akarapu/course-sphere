@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FaArrowLeft,
   FaSave,
-  FaBell,
   FaUserCircle,
-  FaSearch,
   FaPlus
 } from "react-icons/fa";
 import { clearCurrentUser } from "../../utils/auth";
@@ -13,9 +10,14 @@ import { clearCurrentUser } from "../../utils/auth";
 const CreateCourse = () => {
 
   const navigate = useNavigate();
+
   const handleLogout = () => {
     clearCurrentUser();
     navigate("/");
+  };
+
+  const goToSettings = () => {
+    navigate("/educator/settings");
   };
 
   const [courseTitle, setCourseTitle] = useState("");
@@ -35,6 +37,7 @@ const CreateCourse = () => {
   return (
     <>
       <style>{`
+
         * {
           font-family: "Poppins", sans-serif;
           box-sizing: border-box;
@@ -48,7 +51,6 @@ const CreateCourse = () => {
           min-height: 100vh;
         }
 
-        /* SIDEBAR */
         .sidebar {
           width: 230px;
           background: white;
@@ -82,87 +84,60 @@ const CreateCourse = () => {
           box-shadow: 0 10px 20px rgba(108, 99, 255, 0.28);
         }
 
-        /* MAIN */
         .main {
           flex: 1;
           display: flex;
           flex-direction: column;
         }
 
-        /* TOPBAR */
+        /* UPDATED NAVBAR */
+
         .topbar {
           background: white;
-          padding: 15px 35px;
+          padding: 10px 30px;
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-end;
           align-items: center;
           border-bottom: 1px solid #eee;
-        }
-
-        .search-container {
-          display: flex;
-          align-items: center;
-          background: #f4f6fb;
-          padding: 8px 15px;
-          border-radius: 8px;
-          width: 250px;
-          gap: 10px;
-          transition: 0.2s ease;
-        }
-
-        .search-container:focus-within {
-          background: #fff;
-          border: 1px solid #6c63ff;
-        }
-
-        .search-container input {
-          border: none;
-          background: transparent;
-          outline: none;
-          width: 100%;
         }
 
         .nav-right {
           display: flex;
           align-items: center;
-          gap: 30px;
+          gap: 20px;
+        }
+
+        .profile-icon {
+          color: #555;
+          cursor: pointer;
+          transition: 0.25s ease;
+        }
+
+        .profile-icon:hover {
+          color: #6c63ff;
+          transform: scale(1.1);
         }
 
         .logout-btn {
           border: none;
-          padding: 9px 16px;
+          padding: 6px 16px;
           border-radius: 999px;
-          background: linear-gradient(90deg, #5f5bd6, #7a77e6);
+          background: linear-gradient(90deg,#6c63ff,#8b7cff);
           color: #fff;
           cursor: pointer;
           font-weight: 600;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          transition: 0.2s ease;
         }
 
         .logout-btn:hover {
           transform: translateY(-1px);
-          box-shadow: 0 10px 20px rgba(95, 91, 214, 0.3);
+          box-shadow: 0 8px 18px rgba(108,99,255,0.25);
         }
 
         /* CONTENT */
+
         .content {
           padding: 30px 50px;
-        }
-
-        .top-header {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-          margin-bottom: 25px;
-        }
-
-        .back-btn {
-          cursor: pointer;
-          color: #6c63ff;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 8px;
         }
 
         .editor-layout {
@@ -176,12 +151,6 @@ const CreateCourse = () => {
           border-radius: 18px;
           overflow: hidden;
           box-shadow: 0 12px 30px rgba(0,0,0,0.05);
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .video-section:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 18px 36px rgba(0,0,0,0.08);
         }
 
         .placeholder-video {
@@ -205,7 +174,6 @@ const CreateCourse = () => {
 
         .tabs {
           display: flex;
-          align-items: center;
           gap: 25px;
           padding: 12px 25px;
           background: linear-gradient(90deg, #6c63ff, #8b7cff);
@@ -219,7 +187,6 @@ const CreateCourse = () => {
           font-size: 14px;
           cursor: pointer;
           color: rgba(255,255,255,0.85);
-          font-weight: 500;
         }
 
         .tab.active {
@@ -233,22 +200,14 @@ const CreateCourse = () => {
           padding: 25px;
         }
 
-        textarea {
-          width: 100%;
-          min-height: 160px;
-          padding: 12px;
-          border-radius: 8px;
-          border: 1px solid #ddd;
-          resize: vertical;
-        }
-
+        textarea,
         input[type="file"],
         input[type="text"] {
           width: 100%;
           padding: 10px;
-          margin-top: 10px;
           border-radius: 8px;
           border: 1px solid #ddd;
+          margin-top: 10px;
         }
 
         .sidebar-content {
@@ -264,7 +223,6 @@ const CreateCourse = () => {
           margin-bottom: 10px;
           cursor: pointer;
           font-size: 14px;
-          transition: 0.2s ease;
         }
 
         .lesson-item:hover {
@@ -288,12 +246,6 @@ const CreateCourse = () => {
           align-items: center;
           gap: 6px;
           font-size: 13px;
-          transition: 0.2s ease;
-        }
-
-        .add-lesson-btn:hover {
-          background: #574fd6;
-          transform: translateY(-1px);
         }
 
         .save-wrapper {
@@ -315,57 +267,44 @@ const CreateCourse = () => {
           font-weight: 600;
         }
 
-        .save-btn:hover {
-          background: #574fd6;
-          transform: translateY(-1px);
-        }
-
       `}</style>
 
       <div className="dashboard">
 
-        {/* SIDEBAR */}
         <div className="sidebar">
           <h2>CourseSphere</h2>
           <ul>
             <li onClick={() => navigate("/educator/dashboard")}>Dashboard</li>
             <li onClick={() => navigate("/educator/courses")}>My Courses</li>
-            <li className="active" onClick={() => navigate("/educator/create-course")}>Create Course</li>
+            <li className="active">Create Course</li>
             <li onClick={() => navigate("/educator/students")}>Students</li>
             <li onClick={() => navigate("/educator/settings")}>Settings</li>
           </ul>
         </div>
 
-        {/* MAIN */}
         <div className="main">
 
-          {/* TOPBAR */}
+          {/* UPDATED NAVBAR */}
           <div className="topbar">
-            <div className="search-container">
-              <FaSearch />
-              <input type="text" placeholder="Search..." />
-            </div>
             <div className="nav-right">
-              <FaBell />
-              <FaUserCircle size={26} />
-              <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              <FaUserCircle
+                size={24}
+                className="profile-icon"
+                onClick={goToSettings}
+              />
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           </div>
 
           <div className="content">
 
-            <div className="top-header">
-              <div className="back-btn" onClick={() => navigate("/educator/dashboard")}>
-                <FaArrowLeft /> Back
-              </div>
-              <h2>Create New Course</h2>
-            </div>
+            <h2 style={{ marginBottom: "25px" }}>Create New Course</h2>
 
             <div className="editor-layout">
 
-              {/* LEFT SIDE */}
               <div>
-
                 <div className="video-section">
 
                   <div className="placeholder-video">
@@ -387,10 +326,7 @@ const CreateCourse = () => {
                         className={`tab ${activeTab === tab ? "active" : ""}`}
                         onClick={() => setActiveTab(tab)}
                       >
-                        {tab === "description" && "Description"}
-                        {tab === "notes" && "Lecture Notes"}
-                        {tab === "files" && "Attach Files"}
-                        {tab === "video" && "Video"}
+                        {tab.toUpperCase()}
                       </div>
                     ))}
                   </div>
@@ -432,7 +368,6 @@ const CreateCourse = () => {
 
               </div>
 
-              {/* RIGHT SIDE */}
               <div className="sidebar-content">
                 <h3>Course Contents</h3>
 

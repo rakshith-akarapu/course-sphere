@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaBell, FaUserCircle } from "react-icons/fa";
+import { FaArrowLeft, FaUserCircle } from "react-icons/fa";
 import { clearCurrentUser } from "../../utils/auth";
 
 const Doubts = () => {
 
   const navigate = useNavigate();
+
   const handleLogout = () => {
     clearCurrentUser();
     navigate("/");
+  };
+
+  const goToSettings = () => {
+    navigate("/educator/settings");
   };
 
   const [replies, setReplies] = useState({});
@@ -41,66 +46,48 @@ const Doubts = () => {
         background:#f4f6fb;
       }
 
-      /* TOPBAR */
+      /* UPDATED TOPBAR */
 
       .topbar{
         background:white;
-        padding:16px 40px;
+        padding:10px 30px;
         display:flex;
-        justify-content:space-between;
+        justify-content:flex-end;
         align-items:center;
         border-bottom:1px solid #eee;
-      }
-
-      .nav-left{
-        display:flex;
-        align-items:center;
-        gap:20px;
-      }
-
-      .back-btn{
-        display:flex;
-        align-items:center;
-        gap:8px;
-        cursor:pointer;
-        color:#6c63ff;
-        font-weight:500;
-        font-size:14px;
-        padding:8px 14px;
-        border-radius:8px;
-        transition:0.2s;
-      }
-
-      .back-btn:hover{
-        background:#f1f1ff;
-        transform:translateX(-2px);
-      }
-
-      .page-title{
-        font-size:18px;
-        font-weight:600;
       }
 
       .nav-right{
         display:flex;
         align-items:center;
-        gap:25px;
+        gap:20px;
+      }
+
+      .profile-icon{
+        color:#555;
+        cursor:pointer;
+        transition:0.25s ease;
+      }
+
+      .profile-icon:hover{
+        color:#6c63ff;
+        transform:scale(1.1);
       }
 
       .logout-btn{
         border:none;
-        padding:9px 16px;
+        padding:6px 16px;
         border-radius:999px;
-        background:linear-gradient(90deg, #5f5bd6, #7a77e6);
+        background:linear-gradient(90deg,#6c63ff,#8b7cff);
         color:#fff;
         cursor:pointer;
         font-weight:600;
-        transition:transform 0.2s ease, box-shadow 0.2s ease;
+        transition:0.2s ease;
       }
 
       .logout-btn:hover{
         transform:translateY(-1px);
-        box-shadow:0 10px 20px rgba(95, 91, 214, 0.3);
+        box-shadow:0 8px 18px rgba(108,99,255,0.25);
       }
 
       /* CONTENT */
@@ -109,6 +96,28 @@ const Doubts = () => {
         padding:40px;
         max-width:900px;
         margin:auto;
+      }
+
+      .back-button{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:10px 18px;
+        border-radius:8px;
+        border:1px solid #6c63ff;
+        background:white;
+        color:#6c63ff;
+        font-weight:600;
+        cursor:pointer;
+        transition:0.25s ease;
+        margin-bottom:25px;
+      }
+
+      .back-button:hover{
+        background:#6c63ff;
+        color:white;
+        transform:translateY(-1px);
+        box-shadow:0 8px 18px rgba(108,99,255,0.25);
       }
 
       .doubt-card{
@@ -159,44 +168,36 @@ const Doubts = () => {
 
       `}</style>
 
-      {/* TOP NAVBAR */}
+      {/* UPDATED NAVBAR */}
 
       <div className="topbar">
-
-        <div className="nav-left">
-
-          <div
-            className="back-btn"
-            onClick={()=>navigate("/educator/courses")}
-          >
-            <FaArrowLeft />
-            Back
-          </div>
-
-          <div className="page-title">
-            Student Doubts
-          </div>
-
-        </div>
-
         <div className="nav-right">
-          <FaBell />
-          <FaUserCircle size={26}/>
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          <FaUserCircle
+            size={24}
+            className="profile-icon"
+            onClick={goToSettings}
+          />
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
-
       </div>
 
       {/* CONTENT */}
 
       <div className="container">
 
+        <button
+          className="back-button"
+          onClick={()=>navigate("/educator/courses")}
+        >
+          <FaArrowLeft />
+          Back to Courses
+        </button>
+
         {doubts.map(d => (
 
-          <div
-            key={d.id}
-            className="doubt-card"
-          >
+          <div key={d.id} className="doubt-card">
 
             <div className="student-name">
               {d.student}

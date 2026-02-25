@@ -1,69 +1,77 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/auth.css";
+import "../styles/Register.css";
+import img from "../assets/register.png";
 
 function Register() {
-  const navigate = useNavigate();   // ✅ important
+
+  const navigate = useNavigate();
 
   return (
-    <div className="register-container">
+    <div className="register">
 
       {/* LEFT SIDE */}
-      <div className="register-left">
+      <div className="left">
 
-        <h2 className="logo">
-          <span className="diamond"></span>
-          CourseSphere
-        </h2>
+        {/* Logo */}
+        <h1 className="logo">CourseSphere</h1>
 
-        <h1 className="register-heading">
-          Welcome to CourseSphere
-        </h1>
+        {/* Heading */}
+        <h2>Welcome to CourseSphere</h2>
 
-        {/* TOGGLE */}
-        <div className="register-toggle">
-          <button
-            onClick={() => navigate("/")}   // ✅ go to login
+        {/* Login / Register Tabs */}
+        <div className="tabs">
+          <button 
+            type="button"
+            className="tab"
+            onClick={() => navigate("/")}   // ✅ updated
           >
             Login
           </button>
 
-          <button
-            className="active"
-            onClick={() => navigate("/register")} // stay here
+          <button 
+            type="button"
+            className="tab active"
+            onClick={() => navigate("/register")}  // ✅ updated
           >
             Register
           </button>
         </div>
 
-        <p className="register-subtext">
+        {/* Description */}
+        <p>
           Learn smarter. Manage courses effortlessly.
         </p>
 
-        {/* Teacher */}
-        <div
-          className="register-card"
-          onClick={() => navigate("/join/educator")}
-        >
-          <span>I'm a teacher</span>
-          <span>›</span>
-        </div>
-
-        {/* Student */}
-        <div
-          className="register-card"
-          onClick={() => navigate("/join/student")}
+        {/* STUDENT BUTTON */}
+        <button 
+          type="button"
+          className="box"
+          onClick={() => navigate("/join/student")}   // ✅ updated
         >
           <span>I'm a learner</span>
-          <span>›</span>
-        </div>
+          <span>→</span>
+        </button>
+
+        {/* EDUCATOR BUTTON */}
+        <button 
+          type="button"
+          className="box"
+          onClick={() => navigate("/join/educator")}  // ✅ updated
+        >
+          <span>I'm an educator</span>
+          <span>→</span>
+        </button>
 
       </div>
 
       {/* RIGHT SIDE */}
-      <div className="register-right">
-        <div className="register-illustration-box">
-          <img src="/register-illustration.png" alt="register visual" />
-        </div>
+      <div className="right">
+        <img 
+          src={img} 
+          alt="Register Illustration" 
+          className="image"
+        />
       </div>
 
     </div>
