@@ -10,68 +10,52 @@ function Register() {
   return (
     <div className="register">
 
-      {/* LEFT SIDE */}
+      {/* LEFT */}
       <div className="left">
 
-        {/* Logo */}
         <h1 className="logo">CourseSphere</h1>
 
-        {/* Heading */}
         <h2>Welcome to CourseSphere</h2>
 
-        {/* Login / Register Tabs */}
         <div className="tabs">
-          <button 
+          <button
             type="button"
             className="tab"
-            onClick={() => navigate("/")}   // ✅ updated
+            onClick={() => navigate("/")}
           >
             Login
           </button>
 
-          <button 
+          <button
             type="button"
             className="tab active"
-            onClick={() => navigate("/register")}  // ✅ updated
           >
             Register
           </button>
         </div>
 
-        {/* Description */}
         <p>
           Learn smarter. Manage courses effortlessly.
         </p>
 
-        {/* STUDENT BUTTON */}
-        <button 
+        <button
           type="button"
           className="box"
-          onClick={() => navigate("/join/student")}   // ✅ updated
+          onClick={() => navigate("/join/student")}
         >
           <span>I'm a learner</span>
           <span>→</span>
         </button>
 
-        {/* EDUCATOR BUTTON */}
-        <button 
-          type="button"
-          className="box"
-          onClick={() => navigate("/join/educator")}  // ✅ updated
-        >
-          <span>I'm an educator</span>
-          <span>→</span>
-        </button>
+        <p>
+          Educator accounts are managed privately. Public registration is available only for students.
+        </p>
 
       </div>
 
-      {/* RIGHT SIDE */}
+      {/* RIGHT */}
       <div className="right">
-        <img 
-          src={img} 
-          alt="Register Illustration" 
-          className="image"
-        />
+        <img src={img} alt="Register" className="image" />
       </div>
 
     </div>

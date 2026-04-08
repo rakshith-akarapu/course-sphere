@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { clearCurrentUser, getCurrentUser } from "../utils/auth";
 import "../styles/navbar.css";
@@ -11,6 +12,11 @@ function Navbar() {
   const currentQuery = searchParams.get("q") || "";
   const isCourseListingPage =
     location.pathname.startsWith("/courses") || location.pathname.startsWith("/explore");
+  const [searchValue, setSearchValue] = useState(currentQuery);
+
+  useEffect(() => {
+    setSearchValue(currentQuery);
+  }, [currentQuery]);
 
   const handleLogout = () => {
     clearCurrentUser();
@@ -19,8 +25,7 @@ function Navbar() {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const trimmed = String(formData.get("search") || "").trim();
+    const trimmed = searchValue.trim();
 
     if (isCourseListingPage) {
       const nextParams = new URLSearchParams(searchParams);
@@ -42,19 +47,11 @@ function Navbar() {
   };
 
   const handleSearchInputChange = (event) => {
-    const typedValue = event.target.value;
-    const nextParams = new URLSearchParams(searchParams);
-
-    if (typedValue.trim()) {
-      nextParams.set("q", typedValue);
-    } else {
-      nextParams.delete("q");
-    }
-
-    setSearchParams(nextParams, { replace: true });
+    setSearchValue(event.target.value);
   };
 
   const handleClearSearch = () => {
+    setSearchValue("");
     const nextParams = new URLSearchParams(searchParams);
     nextParams.delete("q");
     setSearchParams(nextParams, { replace: true });
@@ -66,34 +63,39 @@ function Navbar() {
       {/* Search */}
       <div className="nav-left">
         <form className="search-form" onSubmit={handleSearchSubmit}>
-          <input
-            type="search"
-            className="search-input"
-            placeholder="Search courses, instructor..."
-            name="search"
-            value={currentQuery}
-            onChange={handleSearchInputChange}
-          />
-          {currentQuery && (
-            <button
-              type="button"
-              className="search-clear-btn"
-              onClick={handleClearSearch}
-              aria-label="Clear search"
-            >
-              ×
-            </button>
-          )}
-          <button type="submit" className="search-submit-btn">Search</button>
+          <div className="search-input-wrap">
+            <input
+              type="search"
+              className="search-input"
+              placeholder="Search courses or educator"
+              name="search"
+              value={searchValue}
+              onChange={handleSearchInputChange}
+            />
+            {searchValue && (
+              <button
+                type="button"
+                className="search-clear-btn"
+                onClick={handleClearSearch}
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
+          <button type="submit" className="search-submit-btn btn btn-primary btn-sm">Search</button>
         </form>
       </div>
 
       {/* Right Section */}
       <div className="nav-right">
-        <span className="user-name">{currentUser?.name || "Guest"}</span>
+        <div className="user-meta">
+          <span className="user-label">Signed in as</span>
+          <span className="user-name">{currentUser?.name || "Guest"}</span>
+        </div>
 
         <button
-          className="logout-btn"
+          className="logout-btn btn btn-outline btn-sm"
           onClick={handleLogout}
         >
           Logout

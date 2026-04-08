@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
-import { clearCurrentUser, getCurrentUser, setCurrentUser } from "../../utils/auth";
+import { FaUserCircle, FaSearch } from "react-icons/fa";
+import API from "../../api/api";
+import { clearCurrentUser, setCurrentUser } from "../../utils/auth";
+import "../../styles/educator-layout.css";
 
 const EducatorSettings = () => {
 
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
     clearCurrentUser();
@@ -17,285 +19,148 @@ const EducatorSettings = () => {
     navigate("/educator/settings");
   };
 
-  const [fullName, setFullName] = useState(user?.name || "Educator");
-  const [email, setEmail] = useState(user?.email || "");
-  const [phone, setPhone] = useState(user?.phone || "");
-  const [specialization, setSpecialization] = useState(user?.designation || "Educator");
-  const [location, setLocation] = useState(user?.location || "");
+  // 🔥 CORE FIELDS
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  
+  // 🔥 EDUCATOR SPECIFIC FIELDS 
+  const [qualification, setQualification] = useState("");
+  const [specialization, setSpecialization] = useState("");
+  
   const [saved, setSaved] = useState(false);
 
-  const handleSave = () => {
-    setCurrentUser({
-      ...(user || {}),
-      name: fullName.trim() || "Educator",
-      email: email.trim().toLowerCase(),
-      phone: phone.trim(),
-      designation: specialization.trim() || "Educator",
-      location: location.trim(),
-      role: "educator",
-    });
+  // 🔥 FETCH USER DATA
+  useEffect(() => {
+    API.get("/user/profile", {
+      headers: { Authorization: "Bearer " + token }
+    })
+    .then(res => {
+      const user = res.data;
+      const nameParts = (user.username || "").split(" ");
 
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1500);
+      setFirstName(nameParts[0] || "");
+      setLastName(nameParts.slice(1).join(" ") || "");
+      setEmail(user.email || "");
+      setPhone(user.phone || "");
+      
+      // Use the actual payload columns we established in the backend refactor!
+      setQualification(user.qualification || "");
+      setSpecialization(user.specialization || "");
+    })
+    .catch(err => console.error(err));
+  }, []);
+
+  const mergedName = `${firstName} ${lastName}`.trim();
+
+  // 🔥 SAVE TO BACKEND
+  const handleSave = () => {
+    const updatedUser = {
+      username: mergedName,
+      email: email,
+      phone: phone,
+      qualification: qualification,
+      specialization: specialization
+    };
+
+    API.put("/user/profile", updatedUser, {
+      headers: { Authorization: "Bearer " + token }
+    })
+    .then(() => {
+      setCurrentUser({
+        name: mergedName,
+        email: email,
+        phone: phone,
+        role: "educator"
+      });
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    })
+    .catch(err => console.error(err));
   };
 
   return (
-    <>
-      <style>{`
+    <div className="dashboard">
 
-        * { 
-          margin: 0; 
-          padding: 0; 
-          box-sizing: border-box; 
-          font-family: "Poppins", sans-serif; 
-        }
+      <div className="sidebar">
+        <h2>CourseSphere</h2>
+        <ul>
+          <li onClick={()=>navigate("/educator/dashboard")}>Dashboard</li>
+          <li onClick={()=>navigate("/educator/courses")}>My Courses</li>
+          <li onClick={()=>navigate("/educator/create-course")}>Create Course</li>
+          <li onClick={()=>navigate("/educator/students")}>Students</li>
+          <li className="active">Settings</li>
+        </ul>
+      </div>
 
-        .dashboard { 
-          display: flex; 
-          background: #f4f6fb; 
-          min-height: 100vh; 
-        }
+      <div className="main">
 
-        .sidebar { 
-          width: 230px; 
-          background: white; 
-          padding: 30px 20px; 
-          border-right: 1px solid #eee; 
-        }
-
-        .sidebar h2 { 
-          color: #6c63ff; 
-          margin-bottom: 35px; 
-        }
-
-        .sidebar li { 
-          list-style: none; 
-          padding: 12px; 
-          margin-bottom: 12px; 
-          border-radius: 8px; 
-          cursor: pointer; 
-          font-size: 14px; 
-          transition: 0.25s ease; 
-        }
-
-        .sidebar li:hover { 
-          background: #f1f1ff; 
-          transform: translateX(4px); 
-        }
-
-        .sidebar li.active { 
-          background: #6c63ff; 
-          color: white; 
-          box-shadow: 0 10px 20px rgba(108, 99, 255, 0.28); 
-        }
-
-        .main { 
-          flex: 1; 
-          display: flex; 
-          flex-direction: column; 
-        }
-
-        /* UPDATED NAVBAR */
-
-        .topbar {
-          background: white;
-          padding: 10px 30px;
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-          border-bottom: 1px solid #eee;
-        }
-
-        .nav-right {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .profile-icon {
-          color: #555;
-          cursor: pointer;
-          transition: 0.25s ease;
-        }
-
-        .profile-icon:hover {
-          color: #6c63ff;
-          transform: scale(1.1);
-        }
-
-        .logout-btn {
-          border: none;
-          padding: 6px 16px;
-          border-radius: 999px;
-          background: linear-gradient(90deg,#6c63ff,#8b7cff);
-          color: #fff;
-          cursor: pointer;
-          font-weight: 600;
-          transition: 0.2s ease;
-        }
-
-        .logout-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 18px rgba(108,99,255,0.25);
-        }
-
-        .content { 
-          padding: 32px 40px; 
-        }
-
-        .card { 
-          background: white; 
-          border-radius: 14px; 
-          padding: 26px; 
-          box-shadow: 0 8px 25px rgba(0,0,0,0.06); 
-          max-width: 760px; 
-          transition: transform 0.25s ease, box-shadow 0.25s ease; 
-        }
-
-        .card:hover { 
-          transform: translateY(-3px); 
-          box-shadow: 0 14px 30px rgba(0,0,0,0.08); 
-        }
-
-        .card h3 { 
-          margin-bottom: 18px; 
-        }
-
-        .grid { 
-          display: grid; 
-          grid-template-columns: 1fr 1fr; 
-          gap: 16px; 
-        }
-
-        .field { 
-          display: flex; 
-          flex-direction: column; 
-        }
-
-        .field label { 
-          margin-bottom: 6px; 
-          color: #555; 
-          font-size: 14px; 
-        }
-
-        .field input { 
-          padding: 11px 12px; 
-          border: 1px solid #ddd; 
-          border-radius: 8px; 
-          outline: none; 
-        }
-
-        .field input:focus { 
-          border-color: #6c63ff; 
-          box-shadow: 0 0 0 3px rgba(108,99,255,0.12); 
-        }
-
-        .actions { 
-          margin-top: 18px; 
-          display: flex; 
-          align-items: center; 
-          gap: 12px; 
-        }
-
-        .save-btn { 
-          border: none; 
-          padding: 11px 18px; 
-          border-radius: 8px; 
-          background: #6c63ff; 
-          color: #fff; 
-          cursor: pointer; 
-          transition: 0.2s ease; 
-        }
-
-        .save-btn:hover { 
-          background: #574fd6; 
-          transform: translateY(-1px); 
-          box-shadow: 0 10px 22px rgba(87, 79, 214, 0.32); 
-        }
-
-        .saved { 
-          color: #16a34a; 
-          font-size: 13px; 
-          font-weight: 600; 
-        }
-
-      `}</style>
-
-      <div className="dashboard">
-
-        <div className="sidebar">
-          <h2>CourseSphere</h2>
-          <ul>
-            <li onClick={() => navigate("/educator/dashboard")}>Dashboard</li>
-            <li onClick={() => navigate("/educator/courses")}>My Courses</li>
-            <li onClick={() => navigate("/educator/create-course")}>Create Course</li>
-            <li onClick={() => navigate("/educator/students")}>Students</li>
-            <li className="active" onClick={() => navigate("/educator/settings")}>Settings</li>
-          </ul>
-        </div>
-
-        <div className="main">
-
-          <div className="topbar">
-            <div className="nav-right">
-              <FaUserCircle
-                size={24}
-                className="profile-icon"
-                onClick={goToSettings}
-              />
-              <button className="logout-btn" onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
+        <div className="topbar">
+          <div className="search-container">
+            <FaSearch />
+            <input placeholder="Search settings..." />
           </div>
 
-          <div className="content">
-            <div className="card">
-              <h3>Educator Settings</h3>
+          <div className="nav-right">
+            <FaUserCircle onClick={goToSettings}/>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          </div>
+        </div>
 
-              <div className="grid">
-                <div className="field">
-                  <label>Full Name</label>
-                  <input value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                </div>
+        <div className="content">
+          <div className="section-title">Account Settings</div>
 
-                <div className="field">
-                  <label>Email</label>
-                  <input value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-
-                <div className="field">
-                  <label>Phone</label>
-                  <input value={phone} onChange={(e) => setPhone(e.target.value)} />
-                </div>
-
-                <div className="field">
-                  <label>Specialization</label>
-                  <input
-                    value={specialization}
-                    onChange={(e) => setSpecialization(e.target.value)}
-                  />
-                </div>
-
-                <div className="field">
-                  <label>Location</label>
-                  <input value={location} onChange={(e) => setLocation(e.target.value)} />
-                </div>
-              </div>
-
-              <div className="actions">
-                <button className="save-btn" onClick={handleSave}>
-                  Save Changes
-                </button>
-                {saved && <span className="saved">Saved</span>}
-              </div>
-
+          <div className="card">
+            <div className="card-header">
+              <h3>Educator Profile</h3>
             </div>
+
+            <div className="grid">
+              <div className="field">
+                <label>First Name</label>
+                <input placeholder="e.g. John" value={firstName} onChange={(e)=>setFirstName(e.target.value)} />
+              </div>
+
+              <div className="field">
+                <label>Last Name</label>
+                <input placeholder="e.g. Doe" value={lastName} onChange={(e)=>setLastName(e.target.value)} />
+              </div>
+
+              <div className="field">
+                <label>Email Address</label>
+                <input disabled style={{background: '#f1f5f9', color: '#94a3b8', cursor: 'not-allowed'}} value={email} />
+              </div>
+
+              <div className="field">
+                <label>Phone Number</label>
+                <input placeholder="e.g. 9876543210" value={phone} onChange={(e)=>setPhone(e.target.value)} />
+              </div>
+
+              <div className="field">
+                <label>Highest Qualification</label>
+                <input placeholder="e.g. Ph.D. in Computer Science" value={qualification} onChange={(e)=>setQualification(e.target.value)} />
+              </div>
+
+              <div className="field">
+                <label>Specialization Domain</label>
+                <input placeholder="e.g. Artificial Intelligence" value={specialization} onChange={(e)=>setSpecialization(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="save-btn" onClick={handleSave}>
+                Save Changes
+              </button>
+              {saved && <span className="saved">Profile updated successfully! ✅</span>}
+            </div>
+
           </div>
 
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

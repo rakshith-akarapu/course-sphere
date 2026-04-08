@@ -1,14 +1,18 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
   FaUserCircle
 } from "react-icons/fa";
+import API from "../../api/api";
 import { clearCurrentUser } from "../../utils/auth";
 
 const Assignments = () => {
 
   const navigate = useNavigate();
+  const { id } = useParams();
+  const courseId = Number(id);
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
     clearCurrentUser();
@@ -19,32 +23,116 @@ const Assignments = () => {
     navigate("/educator/settings");
   };
 
+  const [course, setCourse] = useState(null);
+  const [assignments, setAssignments] = useState([]);
+  const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [grades, setGrades] = useState({});
+  const [newAssignment, setNewAssignment] = useState({
+    title: "",
+    question: ""
+  });
 
-  const assignments = [
-    {
-      id: 1,
-      title: "Build Responsive Landing Page",
-      submissions: [
-        { student: "Rahul Sharma" },
-        { student: "Sneha Iyer" }
-      ]
-    },
-    {
-      id: 2,
-      title: "Create Portfolio Website",
-      submissions: [
-        { student: "Arjun Rao" },
-        { student: "Meera Kapoor" }
-      ]
+  const authHeaders = {
+    headers: {
+      Authorization: "Bearer " + token
     }
-  ];
+  };
 
-  const handleGrade = (student, value) => {
+  const loadAssignments = async () => {
+    if (!courseId) return;
+
+    try {
+      const [courseRes, assignmentsRes] = await Promise.all([
+        API.get(`/educator/courses/${courseId}`, authHeaders),
+        API.get(`/educator/courses/${courseId}/assignments`, authHeaders)
+      ]);
+
+      const studentsRes = await API.get("/educator/students", authHeaders);
+
+      const submissionGroups = await Promise.all(
+        assignmentsRes.data.map(async (assignment) => {
+          const submissionsRes = await API.get(
+            `/educator/submissions/${assignment.id}`,
+            authHeaders
+          );
+
+          return {
+            ...assignment,
+            submissions: submissionsRes.data
+          };
+        })
+      );
+
+      setCourse(courseRes.data);
+      setAssignments(submissionGroups);
+      setEnrolledStudents(
+        studentsRes.data.filter((student) => String(student.code) === String(courseId))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    loadAssignments();
+  }, [courseId, token]);
+
+  const handleGrade = (submissionId, value) => {
     setGrades({
       ...grades,
-      [student]: value
+      [submissionId]: value
     });
+  };
+
+  const handleCreateAssignment = async () => {
+    if (!newAssignment.title.trim() || !newAssignment.question.trim()) {
+      alert("Assignment title and question are required.");
+      return;
+    }
+
+    try {
+      await API.post(
+        "/educator/assignment",
+        {
+          courseId,
+          title: newAssignment.title.trim(),
+          question: newAssignment.question.trim()
+        },
+        authHeaders
+      );
+
+      setNewAssignment({
+        title: "",
+        question: ""
+      });
+      await loadAssignments();
+      alert("Assignment created ✅");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data || "Unable to create assignment");
+    }
+  };
+
+  // 🔥 SEND GRADE
+  const submitGrade = (submissionId) => {
+
+    const grade = grades[submissionId];
+    if (!grade) return;
+
+    API.put(
+      `/educator/submission/${submissionId}/grade?grade=${grade}`,
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      }
+    )
+    .then(() => {
+      alert("Grade submitted ✅");
+      loadAssignments();
+    })
+    .catch(err => console.error(err));
   };
 
   return (
@@ -61,8 +149,6 @@ const Assignments = () => {
       body{
         background:#f4f6fb;
       }
-
-      /* UPDATED NAVBAR */
 
       .topbar{
         background:white;
@@ -87,56 +173,27 @@ const Assignments = () => {
       .profile-icon{
         color:#555;
         cursor:pointer;
-        transition:0.25s ease;
-      }
-
-      .profile-icon:hover{
-        color:#6c63ff;
-        transform:scale(1.1);
       }
 
       .logout-btn{
         border:none;
         padding:6px 16px;
         border-radius:999px;
-        background:linear-gradient(90deg,#6c63ff,#8b7cff);
+        background:#6c63ff;
         color:#fff;
-        cursor:pointer;
-        font-weight:600;
-        transition:0.2s ease;
       }
-
-      .logout-btn:hover{
-        transform:translateY(-1px);
-        box-shadow:0 8px 18px rgba(108,99,255,0.25);
-      }
-
-      /* CONTENT */
 
       .container{
         padding:40px;
       }
 
       .back-button{
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
         padding:10px 18px;
         border-radius:8px;
         border:1px solid #6c63ff;
         background:white;
         color:#6c63ff;
-        font-weight:600;
-        cursor:pointer;
-        transition:0.25s ease;
         margin-bottom:25px;
-      }
-
-      .back-button:hover{
-        background:#6c63ff;
-        color:white;
-        transform:translateY(-1px);
-        box-shadow:0 8px 18px rgba(108,99,255,0.25);
       }
 
       .assignment-card{
@@ -144,13 +201,19 @@ const Assignments = () => {
         padding:25px;
         border-radius:12px;
         margin-bottom:25px;
-        box-shadow:0 5px 15px rgba(0,0,0,0.05);
-        transition:0.25s ease;
       }
 
-      .assignment-card:hover{
-        transform:translateY(-3px);
-        box-shadow:0 12px 28px rgba(0,0,0,0.08);
+      .assignment-form{
+        display:grid;
+        gap:12px;
+      }
+
+      .assignment-form input,
+      .assignment-form textarea{
+        width:100%;
+        padding:10px;
+        border-radius:8px;
+        border:1px solid #ddd;
       }
 
       .assignment-title{
@@ -169,68 +232,115 @@ const Assignments = () => {
         margin-bottom:10px;
       }
 
-      .student-name{
-        font-weight:500;
-      }
-
       .grade-box{
         display:flex;
-        align-items:center;
         gap:10px;
       }
 
       .grade-input{
         width:70px;
         padding:6px;
-        border-radius:6px;
-        border:1px solid #ddd;
       }
 
-      .grade-input:focus{
-        outline:none;
-        border-color:#6c63ff;
-        box-shadow:0 0 0 3px rgba(108, 99, 255, 0.15);
+      .grade-btn{
+        padding:6px 10px;
+        background:#6c63ff;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
       }
 
-      .graded{
-        color:green;
-        font-size:13px;
-        font-weight:500;
+      .file-link{
+        color:#6c63ff;
+        text-decoration:none;
+      }
+
+      .student-chip-list{
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        margin-top:12px;
+      }
+
+      .student-chip{
+        background:#f1f2ff;
+        color:#4338ca;
+        padding:8px 12px;
+        border-radius:999px;
+        font-size:14px;
       }
 
       `}</style>
 
-      {/* UPDATED NAVBAR */}
-
+      {/* NAVBAR */}
       <div className="topbar">
-
-        <div className="course-title">
-          Full Stack Web Development
-        </div>
-
+        <div className="course-title">Assignments</div>
         <div className="nav-right">
-          <FaUserCircle
-            size={24}
-            className="profile-icon"
-            onClick={goToSettings}
-          />
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <FaUserCircle onClick={goToSettings}/>
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
-
       </div>
 
-      {/* MAIN CONTENT */}
-
+      {/* CONTENT */}
       <div className="container">
 
         <button
           className="back-button"
-          onClick={() => navigate("/educator/courses")}
+          onClick={() => navigate(id ? `/educator/course-editor/${id}` : "/educator/courses")}
         >
-          <FaArrowLeft /> Back to Courses
+          <FaArrowLeft /> Back
         </button>
+
+        <div className="assignment-card">
+          <div className="assignment-title">
+            {course ? `Assignments for ${course.title}` : "Assignments"}
+          </div>
+
+          <p style={{ color: "#666", marginBottom: "12px" }}>
+            Any assignment created here is available to students enrolled in this course.
+          </p>
+
+          {enrolledStudents.length > 0 ? (
+            <div className="student-chip-list">
+              {enrolledStudents.map((student) => (
+                <span key={`${student.email}-${student.code}`} className="student-chip">
+                  {student.name}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p style={{ color: "#666", marginTop: "12px" }}>
+              No students are enrolled yet. Students must enroll before they can receive and submit assignments.
+            </p>
+          )}
+
+          <div className="assignment-form">
+            <input
+              type="text"
+              placeholder="Assignment title"
+              value={newAssignment.title}
+              onChange={(e) => setNewAssignment({
+                ...newAssignment,
+                title: e.target.value
+              })}
+            />
+
+            <textarea
+              rows="4"
+              placeholder="Assignment question or instructions"
+              value={newAssignment.question}
+              onChange={(e) => setNewAssignment({
+                ...newAssignment,
+                question: e.target.value
+              })}
+            />
+
+            <button className="grade-btn" onClick={handleCreateAssignment}>
+              Create Assignment
+            </button>
+          </div>
+        </div>
 
         {assignments.map((assignment) => (
 
@@ -240,12 +350,30 @@ const Assignments = () => {
               {assignment.title}
             </div>
 
-            {assignment.submissions.map((submission, index) => (
+            <p style={{ marginBottom: "16px", color: "#666" }}>
+              {assignment.question}
+            </p>
 
-              <div key={index} className="submission">
+            {assignment.submissions.length === 0 && (
+              <p>No submissions yet.</p>
+            )}
 
-                <div className="student-name">
-                  {submission.student}
+            {assignment.submissions.map((submission) => (
+
+              <div key={submission.id} className="submission">
+
+                <div>
+                  <div>{submission.studentEmail}</div>
+                  {submission.fileUrl && (
+                    <a
+                      className="file-link"
+                      href={`http://localhost:3366${submission.fileUrl}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      View submission
+                    </a>
+                  )}
                 </div>
 
                 <div className="grade-box">
@@ -254,20 +382,18 @@ const Assignments = () => {
                     className="grade-input"
                     type="number"
                     placeholder="Grade"
-                    value={grades[submission.student] || ""}
+                    value={grades[submission.id] || ""}
                     onChange={(e) =>
-                      handleGrade(
-                        submission.student,
-                        e.target.value
-                      )
+                      handleGrade(submission.id, e.target.value)
                     }
                   />
 
-                  {grades[submission.student] && (
-                    <span className="graded">
-                      ✔ Graded
-                    </span>
-                  )}
+                  <button
+                    className="grade-btn"
+                    onClick={() => submitGrade(submission.id)}
+                  >
+                    Submit
+                  </button>
 
                 </div>
 
@@ -280,7 +406,6 @@ const Assignments = () => {
         ))}
 
       </div>
-
     </>
   );
 };

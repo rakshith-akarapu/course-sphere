@@ -1,17 +1,21 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
   FaSave,
   FaUserCircle,
   FaQuestionCircle,
-  FaClipboardList
+  FaClipboardList,
+  FaTrash
 } from "react-icons/fa";
+import API from "../../api/api";
 import { clearCurrentUser } from "../../utils/auth";
 
 const CourseEditor = () => {
 
   const navigate = useNavigate();
+  const { id } = useParams();
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
     clearCurrentUser();
@@ -22,19 +26,110 @@ const CourseEditor = () => {
     navigate("/educator/settings");
   };
 
-  const [activeTab, setActiveTab] = useState("description");
-  const [activeLesson, setActiveLesson] = useState(0);
 
-  const lessons = [
-    "1. Sign up in Webflow",
-    "2. What is Webflow?",
-    "3. Web Development Basics",
-    "4. Advanced Layout Techniques"
-  ];
+  const [course, setCourse] = useState({});
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [notesFile, setNotesFile] = useState(null);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+
+  // 🔥 FETCH COURSE
+  useEffect(() => {
+    API.get(`/educator/courses/${id}`, {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+    .then(res => {
+      setCourse(res.data);
+      setTitle(res.data.title || "");
+      setDescription(res.data.description || "");
+      setVideoUrl(res.data.videoUrl || "");
+    })
+    .catch(err => console.error(err));
+  }, [id, token]);
+
+  // 🔥 SAVE COURSE
+  const handleSave = () => {
+
+    const updatedCourse = {
+      ...course,
+      title: title,
+      videoUrl: videoUrl,
+      description: description
+    };
+
+    API.put(
+      `/educator/courses/${id}`,
+      updatedCourse,
+      {
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      }
+    )
+    .then((res) => {
+      setCourse(res.data);
+      setStatusMessage("Course updated successfully.");
+    })
+    .catch(err => {
+      console.error(err);
+      setStatusMessage(err.response?.data || "Unable to update course.");
+    });
+  };
+
+  const handleNotesUpload = async () => {
+    if (!notesFile) {
+      setStatusMessage("Choose a notes file first.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", notesFile);
+
+      const res = await API.post(`/file/upload/course/${id}`, formData, {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      setCourse(res.data);
+      setNotesFile(null);
+      setStatusMessage("Lecture notes uploaded successfully.");
+    } catch (err) {
+      console.error(err);
+      setStatusMessage(err.response?.data || "Unable to upload notes.");
+    }
+  };
+
+  const handleDeleteCourse = async () => {
+    const shouldDelete = window.confirm("Delete this course and all related enrollments, assignments, and doubts?");
+    if (!shouldDelete) return;
+
+    try {
+      setIsDeleting(true);
+      await API.delete(`/educator/courses/${id}`, {
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      });
+      navigate("/educator/courses", { replace: true });
+    } catch (err) {
+      console.error(err);
+      setStatusMessage(err.response?.data || "Unable to delete course.");
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <>
       <style>{`
+
         * { 
           font-family: "Poppins", sans-serif; 
           box-sizing: border-box; 
@@ -66,19 +161,11 @@ const CourseEditor = () => {
           margin-bottom:12px;
           border-radius:8px;
           cursor:pointer;
-          font-size:14px;
-          transition:0.25s ease;
-        }
-
-        .sidebar li:hover {
-          background:#f1f1ff;
-          transform:translateX(4px);
         }
 
         .sidebar li.active {
           background:#6c63ff;
           color:white;
-          box-shadow:0 10px 20px rgba(108, 99, 255, 0.28);
         }
 
         .main { 
@@ -87,48 +174,24 @@ const CourseEditor = () => {
           flex-direction:column; 
         }
 
-        /* UPDATED NAVBAR */
-
         .topbar {
           background: white;
           padding: 10px 30px;
           display: flex;
           justify-content: flex-end;
-          align-items: center;
-          border-bottom: 1px solid #eee;
         }
 
         .nav-right {
           display: flex;
-          align-items: center;
           gap: 20px;
         }
 
-        .profile-icon {
-          color: #555;
-          cursor: pointer;
-          transition: 0.25s ease;
-        }
-
-        .profile-icon:hover {
-          color: #6c63ff;
-          transform: scale(1.1);
-        }
-
         .logout-btn {
+          background:#6c63ff;
+          color:white;
           border:none;
           padding:6px 16px;
           border-radius:999px;
-          background:linear-gradient(90deg,#6c63ff,#8b7cff);
-          color:#fff;
-          cursor:pointer;
-          font-weight:600;
-          transition:0.2s ease;
-        }
-
-        .logout-btn:hover {
-          transform:translateY(-1px);
-          box-shadow:0 8px 18px rgba(108,99,255,0.25);
         }
 
         .content { 
@@ -136,30 +199,16 @@ const CourseEditor = () => {
         }
 
         .back-button {
-          display:inline-flex;
-          align-items:center;
-          gap:8px;
           padding:10px 18px;
           border-radius:8px;
           border:1px solid #6c63ff;
           background:white;
           color:#6c63ff;
-          font-weight:600;
-          cursor:pointer;
-          transition:0.25s ease;
           margin-bottom:15px;
-        }
-
-        .back-button:hover {
-          background:#6c63ff;
-          color:white;
-          transform:translateY(-1px);
-          box-shadow:0 8px 18px rgba(108,99,255,0.25);
         }
 
         .page-title {
           font-size:24px;
-          font-weight:600;
           margin-bottom:25px;
         }
 
@@ -172,89 +221,54 @@ const CourseEditor = () => {
         .video-section {
           background:white;
           border-radius:18px;
-          overflow:hidden;
-          box-shadow:0 12px 30px rgba(0,0,0,0.05);
-        }
-
-        .video-wrapper {
-          position:relative;
-          width:100%;
-          padding-top:56.25%;
-        }
-
-        .video-wrapper iframe {
-          position:absolute;
-          top:0;
-          left:0;
-          width:100%;
-          height:100%;
-          border:none;
+          padding:20px;
         }
 
         .course-title {
           font-size:20px;
-          font-weight:600;
-          padding:20px;
+          margin-bottom:15px;
         }
 
-        .tabs {
-          display:flex;
-          gap:20px;
-          padding:12px 25px;
-          background:linear-gradient(90deg,#6c63ff,#8b7cff);
-          border-radius:50px;
-          width:fit-content;
-          margin:20px 25px;
-        }
-
-        .tab {
-          padding:8px 16px;
-          font-size:14px;
-          cursor:pointer;
-          color:white;
-          opacity:0.8;
-        }
-
-        .tab.active {
-          background:rgba(255,255,255,0.25);
-          border-radius:25px;
-          opacity:1;
-        }
-
-        .tab-content { 
-          padding:25px; 
-        }
-
-        textarea, input {
+        textarea {
           width:100%;
           padding:10px;
           border-radius:8px;
           border:1px solid #ddd;
-          margin-top:10px;
+        }
+
+        .field-label {
+          display:block;
+          margin-bottom:8px;
+          font-weight:600;
+        }
+
+        .text-input {
+          width:100%;
+          padding:10px;
+          border-radius:8px;
+          border:1px solid #ddd;
+          margin-bottom:14px;
         }
 
         .action-wrapper {
-          margin-top:30px;
+          margin-top:20px;
           display:flex;
-          justify-content:flex-end;
-          gap:15px;
+          gap:10px;
+          flex-wrap:wrap;
         }
 
         .btn {
-          padding:12px 20px;
+          padding:10px 16px;
           border:none;
-          border-radius:8px;
-          cursor:pointer;
-          display:flex;
-          align-items:center;
-          gap:8px;
-          font-weight:600;
+          border-radius:6px;
           color:white;
+          cursor:pointer;
         }
 
         .save { background:#6c63ff; }
         .doubt { background:#00b894; }
         .assign { background:#0984e3; }
+        .danger { background:#ef4444; }
 
       `}</style>
 
@@ -264,99 +278,96 @@ const CourseEditor = () => {
           <h2>CourseSphere</h2>
           <ul>
             <li onClick={()=>navigate("/educator/dashboard")}>Dashboard</li>
-            <li className="active" onClick={()=>navigate("/educator/courses")}>My Courses</li>
-            <li onClick={()=>navigate("/educator/create-course")}>Create Course</li>
-            <li onClick={()=>navigate("/educator/students")}>Students</li>
-            <li onClick={()=>navigate("/educator/settings")}>Settings</li>
+            <li className="active">My Courses</li>
           </ul>
         </div>
 
         <div className="main">
 
-          {/* UPDATED NAVBAR */}
           <div className="topbar">
             <div className="nav-right">
-              <FaUserCircle
-                size={24}
-                className="profile-icon"
-                onClick={goToSettings}
-              />
-              <button className="logout-btn" onClick={handleLogout}>
-                Logout
-              </button>
+              <FaUserCircle onClick={goToSettings}/>
+              <button className="logout-btn" onClick={handleLogout}>Logout</button>
             </div>
           </div>
 
           <div className="content">
 
-            <button
-              className="back-button"
-              onClick={()=>navigate("/educator/courses")}
-            >
-              <FaArrowLeft/> Back to Courses
+            <button className="back-button" onClick={()=>navigate("/educator/courses")}>
+              <FaArrowLeft/> Back
             </button>
 
-            <div className="page-title">Edit Course</div>
+            <div className="page-title">
+              Edit Course: {course.title}
+            </div>
 
             <div className="editor-layout">
 
-              <div>
-                <div className="video-section">
-                  <div className="video-wrapper">
-                    <iframe 
-                      src="https://www.youtube.com/embed/iYKl_Sri3pE" 
-                      title="Lecture"
-                    />
-                  </div>
+              <div className="video-section">
 
-                  <div className="course-title">
-                    {lessons[activeLesson]}
-                  </div>
-
-                  <div className="tabs">
-                    {["description","notes","files"].map(tab=>(
-                      <div
-                        key={tab}
-                        className={`tab ${activeTab===tab?"active":""}`}
-                        onClick={()=>setActiveTab(tab)}
-                      >
-                        {tab.toUpperCase()}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="tab-content">
-                    {activeTab==="description" && <textarea defaultValue="Course description here..." />}
-                    {activeTab==="notes" && <textarea defaultValue="Lecture notes here..." />}
-                    {activeTab==="files" && <input type="file" multiple />}
-                  </div>
+                <div className="course-title">
+                  {course.title}
                 </div>
+                {statusMessage && (
+                  <p style={{ marginBottom: "14px", color: "#2563eb" }}>{statusMessage}</p>
+                )}
+
+                <label className="field-label">Course Title</label>
+                <input
+                  className="text-input"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+
+                <label className="field-label">YouTube / Video URL</label>
+                <input
+                  className="text-input"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+
+                <label className="field-label">Description</label>
+
+                <textarea
+                  value={description}
+                  onChange={(e)=>setDescription(e.target.value)}
+                />
+
+                <label className="field-label" style={{ marginTop: "16px" }}>Lecture Notes</label>
+                <input
+                  type="file"
+                  onChange={(e) => setNotesFile(e.target.files?.[0] || null)}
+                />
+
+                {course.fileUrl && (
+                  <p style={{ marginTop: "8px" }}>
+                    Current notes file is available for students to download.
+                  </p>
+                )}
 
                 <div className="action-wrapper">
-                  <button className="btn save"><FaSave/> Save</button>
-                  <button className="btn doubt" onClick={()=>navigate("/educator/doubts")}><FaQuestionCircle/> Doubts</button>
-                  <button className="btn assign" onClick={()=>navigate("/educator/assignments")}><FaClipboardList/> Assignments</button>
-                </div>
-              </div>
+                  <button className="btn save" onClick={handleSave}>
+                    <FaSave/> Save
+                  </button>
 
-              <div style={{background:"white",padding:"20px",borderRadius:"18px"}}>
-                <h3>Course Contents</h3>
-                {lessons.map((lesson,i)=>(
-                  <div
-                    key={i}
-                    style={{
-                      padding:"10px",
-                      cursor:"pointer",
-                      background:i===activeLesson?"#6c63ff":"#f1f1ff",
-                      color:i===activeLesson?"white":"black",
-                      borderRadius:"8px",
-                      marginBottom:"10px"
-                    }}
-                    onClick={()=>setActiveLesson(i)}
-                  >
-                    {lesson}
-                  </div>
-                ))}
+                  <button className="btn save" onClick={handleNotesUpload}>
+                    <FaSave/> Upload Notes
+                  </button>
+
+                  <button className="btn doubt" onClick={()=>navigate("/educator/doubts")}>
+                    <FaQuestionCircle/> Doubts
+                  </button>
+
+                  <button className="btn assign" onClick={()=>navigate(`/educator/courses/${id}/assignments`)}>
+                    <FaClipboardList/> Assignments
+                  </button>
+
+                  <button className="btn danger" onClick={handleDeleteCourse} disabled={isDeleting}>
+                    <FaTrash/> {isDeleting ? "Deleting..." : "Delete Course"}
+                  </button>
+                </div>
+
               </div>
 
             </div>

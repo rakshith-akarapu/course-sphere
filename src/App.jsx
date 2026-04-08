@@ -17,7 +17,6 @@ import AssignmentUpload from "./pages/AssignmentUpload";
 
 /* ---------------- EDUCATOR PAGES ---------------- */
 import EducatorDashboard from "./pages/educator/dashboard/EducatorDashboard";
-import EducatorRegister from "./pages/educator/EducatorRegister";
 import EducatorAssignments from "./pages/educator/Assignments";
 import CreateCourse from "./pages/educator/CreateCourse";
 import CourseEditor from "./pages/educator/CourseEditor";
@@ -71,7 +70,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/join/:role" element={<JoinUs />} />
-        <Route path="/educator/register" element={<EducatorRegister />} />
+        <Route path="/educator/register" element={<Navigate to="/join/student" replace />} />
 
         {/* -------- STUDENT ROUTES -------- */}
 
@@ -196,6 +195,15 @@ function App() {
 
         <Route
           path="/educator/assignments"
+          element={
+            <RequireRole role="educator">
+              <Navigate to="/educator/courses" replace />
+            </RequireRole>
+          }
+        />
+
+        <Route
+          path="/educator/courses/:id/assignments"
           element={
             <RequireRole role="educator">
               <EducatorAssignments />

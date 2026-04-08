@@ -1,4 +1,5 @@
 const USER_STORAGE_KEY = "course_sphere_current_user";
+const TOKEN_STORAGE_KEY = "token";
 
 /* ---------------- NAME FORMAT ---------------- */
 
@@ -33,6 +34,47 @@ export function normalizeRole(role) {
   return normalized === "educator" ? "educator" : "student";
 }
 
+export function decodeTokenPayload(token) {
+  if (!token) return null;
+
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
+    const decoded = atob(padded);
+
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+}
+
+export function decodeTokenRole(token) {
+  const payload = decodeTokenPayload(token);
+  return normalizeRole(payload?.role);
+}
+
+export function getAuthToken() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return localStorage.getItem(TOKEN_STORAGE_KEY);
+}
+
+export function isTokenExpired(token) {
+  const payload = decodeTokenPayload(token);
+  const expiration = payload?.exp;
+
+  if (!expiration) {
+    return true;
+  }
+
+  return Date.now() >= expiration * 1000;
+}
+
 /* ---------------- CREATE USER ---------------- */
 
 export function createUserFromLogin(identifier) {
@@ -54,6 +96,12 @@ export function createUserFromLogin(identifier) {
 
 export function getCurrentUser() {
   if (typeof window === "undefined") {
+    return null;
+  }
+
+  const token = getAuthToken();
+  if (!token || isTokenExpired(token)) {
+    clearCurrentUser();
     return null;
   }
 
@@ -91,4 +139,5 @@ export function clearCurrentUser() {
   }
 
   localStorage.removeItem(USER_STORAGE_KEY);
+  localStorage.removeItem(TOKEN_STORAGE_KEY);
 }

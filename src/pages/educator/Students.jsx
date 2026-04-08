@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FaUserCircle,
-  FaDownload
-} from "react-icons/fa";
+import { FaUserCircle, FaDownload, FaSearch } from "react-icons/fa";
+import API from "../../api/api";
 import { clearCurrentUser } from "../../utils/auth";
+import "../../styles/educator-layout.css";
 
 const Students = () => {
 
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
     clearCurrentUser();
@@ -19,18 +19,67 @@ const Students = () => {
     navigate("/educator/settings");
   };
 
+  const [studentsData, setStudentsData] = useState([]);
+  const [availableStudents, setAvailableStudents] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState("All");
+  const [pageError, setPageError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [assignForm, setAssignForm] = useState({
+    studentEmail: "",
+    courseId: ""
+  });
 
-  const studentsData = [
-    { name: "John", course: "Theory of Computation", code: "CS3452", progress: 75 },
-    { name: "Arjun Kumar", course: "Theory of Computation", code: "CS3452", progress: 60 },
-    { name: "Rahul Verma", course: "Cloud Computing", code: "CC2041", progress: 52 },
-    { name: "Sneha", course: "Cloud Computing", code: "CC2041", progress: 50 },
-    { name: "Meera", course: "UI/UX Design", code: "UX1023", progress: 80 },
-    { name: "Vikram", course: "UI/UX Design", code: "UX1023", progress: 67 }
-  ];
+  const mapStudentRows = (rows) => rows.map((e) => ({
+    name: e.name,
+    email: e.email,
+    course: e.course,
+    code: e.code,
+    progress: e.progress
+  }));
 
-  const courses = ["All", ...new Set(studentsData.map(s => s.course))];
+  const loadStudentData = async () => {
+    setIsLoading(true);
+    setPageError("");
+
+    const [studentsResult, allStudentsResult, coursesResult] = await Promise.allSettled([
+      API.get("/educator/students"),
+      API.get("/educator/students/all"),
+      API.get("/educator/courses")
+    ]);
+
+    if (studentsResult.status === "fulfilled") {
+      setStudentsData(mapStudentRows(studentsResult.value.data));
+    } else {
+      console.error(studentsResult.reason);
+      setStudentsData([]);
+      setPageError("Unable to load the student table right now.");
+    }
+
+    if (allStudentsResult.status === "fulfilled") {
+      setAvailableStudents(allStudentsResult.value.data);
+    } else {
+      console.error(allStudentsResult.reason);
+      setAvailableStudents([]);
+      setPageError((current) => current || "Unable to load the student list for assignment.");
+    }
+
+    if (coursesResult.status === "fulfilled") {
+      setCourses(coursesResult.value.data);
+    } else {
+      console.error(coursesResult.reason);
+      setCourses([]);
+      setPageError((current) => current || "Unable to load your courses for assignment.");
+    }
+
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    loadStudentData();
+  }, [token]);
+
+  const filterCourses = ["All", ...new Set(studentsData.map(s => s.course))];
 
   const filteredStudents =
     selectedCourse === "All"
@@ -38,323 +87,191 @@ const Students = () => {
       : studentsData.filter(s => s.course === selectedCourse);
 
   const downloadCSV = () => {
-    const headers = ["Name", "Course", "Course Code", "Progress (%)"];
+    const headers = ["Name", "Course", "Code", "Progress"];
 
-    const rows = filteredStudents.map(student => [
-      student.name,
-      student.course,
-      student.code,
-      student.progress
+    const rows = filteredStudents.map(s => [
+      s.name,
+      s.course,
+      s.code,
+      s.progress
     ]);
 
-    let csvContent =
+    let csv =
       "data:text/csv;charset=utf-8," +
-      [headers, ...rows]
-        .map(row => row.join(","))
-        .join("\n");
+      [headers, ...rows].map(r => r.join(",")).join("\n");
 
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-
-    link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      `students_${selectedCourse === "All" ? "all" : selectedCourse}.csv`
-    );
-
+    link.setAttribute("href", encodeURI(csv));
+    link.setAttribute("download", "students.csv");
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
   };
 
   return (
-    <>
-      <style>{`
+    <div className="dashboard">
 
-        * { 
-          margin:0; 
-          padding:0; 
-          box-sizing:border-box; 
-          font-family:"Poppins", sans-serif; 
-        }
+      <div className="sidebar">
+        <h2>CourseSphere</h2>
+        <ul>
+          <li onClick={()=>navigate("/educator/dashboard")}>Dashboard</li>
+          <li onClick={()=>navigate("/educator/courses")}>My Courses</li>
+          <li onClick={()=>navigate("/educator/create-course")}>Create Course</li>
+          <li className="active">Students</li>
+          <li onClick={()=>navigate("/educator/settings")}>Settings</li>
+        </ul>
+      </div>
 
-        .dashboard { 
-          display:flex; 
-          background:#f4f6fb; 
-          min-height:100vh; 
-        }
+      <div className="main">
 
-        .sidebar {
-          width:230px;
-          background:white;
-          padding:30px 20px;
-          border-right:1px solid #eee;
-        }
+        <div className="topbar">
+          <div className="search-container">
+            <FaSearch />
+            <input placeholder="Search records..." />
+          </div>
 
-        .sidebar h2 { 
-          color:#6c63ff; 
-          margin-bottom:35px; 
-        }
-
-        .sidebar li {
-          list-style:none;
-          padding:12px;
-          margin-bottom:12px;
-          border-radius:8px;
-          cursor:pointer;
-          font-size:14px;
-          transition:0.25s ease;
-        }
-
-        .sidebar li:hover { 
-          background:#f1f1ff; 
-          transform:translateX(4px); 
-        }
-
-        .sidebar li.active {
-          background:#6c63ff;
-          color:white;
-          box-shadow:0 10px 20px rgba(108,99,255,0.28);
-        }
-
-        .main { 
-          flex:1; 
-          display:flex; 
-          flex-direction:column; 
-        }
-
-        /* UPDATED NAVBAR */
-
-        .topbar {
-          background:white;
-          padding:10px 30px;
-          display:flex;
-          justify-content:flex-end;
-          align-items:center;
-          border-bottom:1px solid #eee;
-        }
-
-        .nav-right {
-          display:flex;
-          align-items:center;
-          gap:20px;
-        }
-
-        .profile-icon {
-          color:#555;
-          cursor:pointer;
-          transition:0.25s ease;
-        }
-
-        .profile-icon:hover {
-          color:#6c63ff;
-          transform:scale(1.1);
-        }
-
-        .logout-btn {
-          border:none;
-          padding:6px 16px;
-          border-radius:999px;
-          background:linear-gradient(90deg,#6c63ff,#8b7cff);
-          color:#fff;
-          cursor:pointer;
-          font-weight:600;
-          transition:0.2s ease;
-        }
-
-        .logout-btn:hover {
-          transform:translateY(-1px);
-          box-shadow:0 8px 18px rgba(108,99,255,0.25);
-        }
-
-        .content { 
-          padding:30px 40px; 
-        }
-
-        .card {
-          background:white;
-          padding:25px;
-          border-radius:16px;
-          box-shadow:0 8px 25px rgba(0,0,0,0.05);
-        }
-
-        .card-header {
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          margin-bottom:20px;
-        }
-
-        .header-right {
-          display:flex;
-          gap:15px;
-          align-items:center;
-        }
-
-        .dropdown {
-          padding:8px 12px;
-          border-radius:8px;
-          border:1px solid #ddd;
-        }
-
-        .download-btn {
-          display:flex;
-          align-items:center;
-          gap:8px;
-          padding:8px 14px;
-          border:none;
-          border-radius:8px;
-          background:linear-gradient(90deg,#6c63ff,#8b7cff);
-          color:white;
-          cursor:pointer;
-          font-weight:500;
-          transition:0.25s ease;
-        }
-
-        .download-btn:hover {
-          transform:translateY(-2px);
-          box-shadow:0 8px 18px rgba(108,99,255,0.3);
-        }
-
-        table {
-          width:100%;
-          border-collapse:collapse;
-        }
-
-        th, td {
-          text-align:left;
-          padding:12px;
-          border-bottom:1px solid #eee;
-          font-size:14px;
-        }
-
-        th { 
-          font-weight:600; 
-          color:#555; 
-        }
-
-        tbody tr:hover { 
-          background:#f8faff; 
-        }
-
-        .progress-bar {
-          background:#eee;
-          border-radius:8px;
-          height:8px;
-          overflow:hidden;
-          margin-top:5px;
-        }
-
-        .progress-fill {
-          height:100%;
-          background:#6c63ff;
-        }
-
-        .total {
-          margin-top:15px;
-          text-align:right;
-          font-weight:500;
-          color:#555;
-        }
-
-      `}</style>
-
-      <div className="dashboard">
-
-        <div className="sidebar">
-          <h2>CourseSphere</h2>
-          <ul>
-            <li onClick={()=>navigate("/educator/dashboard")}>Dashboard</li>
-            <li onClick={()=>navigate("/educator/courses")}>My Courses</li>
-            <li onClick={()=>navigate("/educator/create-course")}>Create Course</li>
-            <li className="active">Students</li>
-            <li onClick={()=>navigate("/educator/settings")}>Settings</li>
-          </ul>
+          <div className="nav-right">
+            <FaUserCircle onClick={goToSettings}/>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          </div>
         </div>
 
-        <div className="main">
+        <div className="content">
+          <div className="section-title">Enrolled Students</div>
 
-          <div className="topbar">
-            <div className="nav-right">
-              <FaUserCircle
-                size={24}
-                className="profile-icon"
-                onClick={goToSettings}
-              />
-              <button className="logout-btn" onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
-          </div>
+          <div className="card">
+            {pageError && (
+              <p className="auth-error" style={{ marginBottom: "16px" }}>
+                {pageError}
+              </p>
+            )}
 
-          <div className="content">
+            <div className="card-header">
+              <h3>Student Details</h3>
 
-            <div className="card">
-
-              <div className="card-header">
-                <h3>Student Details</h3>
-
-                <div className="header-right">
-                  <select
-                    className="dropdown"
-                    value={selectedCourse}
-                    onChange={(e)=>setSelectedCourse(e.target.value)}
-                  >
-                    {courses.map((course,index)=>(
-                      <option key={index} value={course}>{course}</option>
-                    ))}
-                  </select>
-
-                  <button
-                    className="download-btn"
-                    onClick={downloadCSV}
-                  >
-                    <FaDownload size={14}/>
-                    Download CSV
-                  </button>
-                </div>
-              </div>
-
-              <table>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Course</th>
-                    <th>Code</th>
-                    <th>Progress</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {filteredStudents.map((student,index)=>(
-                    <tr key={index}>
-                      <td>{student.name}</td>
-                      <td>{student.course}</td>
-                      <td>{student.code}</td>
-                      <td>
-                        {student.progress}%
-                        <div className="progress-bar">
-                          <div
-                            className="progress-fill"
-                            style={{width:`${student.progress}%`}}
-                          ></div>
-                        </div>
-                      </td>
-                    </tr>
+              <div className="header-right">
+                <select
+                  className="dropdown"
+                  value={selectedCourse}
+                  onChange={(e)=>setSelectedCourse(e.target.value)}
+                >
+                  {filterCourses.map((c,i)=>(
+                    <option key={i}>{c}</option>
                   ))}
-                </tbody>
-              </table>
+                </select>
 
-              <div className="total">
-                Total Students: {filteredStudents.length}
+                <button className="download-btn" onClick={downloadCSV}>
+                  <FaDownload/> Download CSV
+                </button>
+              </div>
+            </div>
+
+            <div className="card-header" style={{ marginBottom: "16px", alignItems: "flex-end" }}>
+              <div>
+                <h3>Assign Course to Student</h3>
+                <p style={{ color: "#666", marginTop: "6px" }}>
+                  Enroll a student into one of your courses directly from here.
+                </p>
               </div>
 
+              <div className="header-right">
+                <select
+                  className="dropdown"
+                  value={assignForm.studentEmail}
+                  onChange={(e) => setAssignForm({
+                    ...assignForm,
+                    studentEmail: e.target.value
+                  })}
+                >
+                  <option value="">Select student</option>
+                  {availableStudents.map((student) => (
+                    <option key={student.email} value={student.email}>
+                      {student.name} ({student.email})
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="dropdown"
+                  value={assignForm.courseId}
+                  onChange={(e) => setAssignForm({
+                    ...assignForm,
+                    courseId: e.target.value
+                  })}
+                >
+                  <option value="">Select course</option>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.title}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  className="download-btn"
+                  disabled={!availableStudents.length || !courses.length}
+                  onClick={() => {
+                    if (!assignForm.studentEmail || !assignForm.courseId) {
+                      alert("Select both a student and a course.");
+                      return;
+                    }
+
+                    API.post(
+                      "/educator/students/assign",
+                      assignForm
+                    )
+                    .then(() => {
+                      alert("Student assigned successfully ✅");
+                      setAssignForm({ studentEmail: "", courseId: "" });
+                      return loadStudentData();
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                      alert(err.response?.data || "Unable to assign student");
+                    });
+                  }}
+                >
+                  Assign Course
+                </button>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Name / Email</th>
+                  <th>Course Segment</th>
+                  <th>Course Code</th>
+                  <th>Progress</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {!isLoading && filteredStudents.length === 0 && (
+                  <tr>
+                    <td colSpan="4">No students found.</td>
+                  </tr>
+                )}
+
+                {filteredStudents.map((s,i)=>(
+                  <tr key={i}>
+                    <td>{s.name} ({s.email})</td>
+                    <td>{s.course}</td>
+                    <td>#{s.code}</td>
+                    <td>{s.progress}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="total">
+              Total Students: {filteredStudents.length}
             </div>
 
           </div>
+
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

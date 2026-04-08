@@ -2,33 +2,66 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import img from "../assets/login.png";
-import google from "../assets/google.png";
 
-import { createUserFromLogin, setCurrentUser } from "../utils/auth";
+import API from "../api/api";
+import { decodeTokenRole, formatDisplayName, setCurrentUser } from "../utils/auth";
 
 function Login() {
+
   const navigate = useNavigate();
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (!identifier.trim()) {
-      alert("Please enter your email");
+  const handleLogin = async () => {
+
+    if (!identifier.trim() || !password.trim()) {
+      alert("Please enter email and password");
       return;
     }
 
-    const user = createUserFromLogin(identifier);
-    setCurrentUser(user);
+    try {
 
-    if (user.role === "educator") {
-      navigate("/educator/dashboard");
-    } else {
-      navigate("/dashboard");
+      // 🔥 LOGIN API
+      const res = await API.post(
+        "/auth/login",
+        {
+          email: identifier,
+          password: password
+        }
+      );
+
+      const token = res.data.token;
+
+      // 🔥 SAVE TOKEN
+      localStorage.setItem("token", token);
+
+      // 🔥 DECODE ROLE (simple approach)
+      const user = {
+        email: identifier.trim().toLowerCase(),
+        name: formatDisplayName(identifier),
+        role: decodeTokenRole(token)
+      };
+
+      setCurrentUser(user);
+
+      alert("Login successful ✅");
+
+      if (user.role === "educator") {
+        navigate("/educator/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Invalid credentials ❌");
     }
   };
 
   return (
     <div className="login">
+
       <div className="left">
         <h1 className="logo">CourseSphere</h1>
         <img src={img} className="image" alt="login" />
@@ -51,7 +84,7 @@ function Login() {
         <label>User name / Email</label>
         <input
           type="text"
-          placeholder="Enter your User name / Email"
+          placeholder="Enter your Email"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
         />
@@ -64,10 +97,7 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="google">
-          <img src={google} className="googleIcon" alt="google" />
-          Continue with Google
-        </button>
+
 
         <div className="options">
           <div>
@@ -83,6 +113,7 @@ function Login() {
         >
           Login
         </button>
+
       </div>
     </div>
   );

@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaUserCircle } from "react-icons/fa";
+import API from "../../api/api";
 import { clearCurrentUser } from "../../utils/auth";
 
 const Doubts = () => {
 
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
     clearCurrentUser();
@@ -16,19 +18,49 @@ const Doubts = () => {
     navigate("/educator/settings");
   };
 
+  const [doubts, setDoubts] = useState([]);
   const [replies, setReplies] = useState({});
 
-  const doubts = [
-    { id:1, student:"Rahul", question:"What is responsive design?" },
-    { id:2, student:"Sneha", question:"Can you explain Flexbox again?" },
-    { id:3, student:"Arjun", question:"Difference between Grid and Flexbox?" }
-  ];
+  // 🔥 FETCH DOUBTS FROM BACKEND
+  useEffect(() => {
+    API.get("/educator/doubts", {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+    .then(res => setDoubts(res.data))
+    .catch(err => console.error(err));
+  }, []);
 
   const handleReply = (id, text) => {
     setReplies({
       ...replies,
       [id]: text
     });
+  };
+
+  // 🔥 SEND REPLY TO BACKEND
+  const submitReply = (doubtId) => {
+
+    const message = replies[doubtId];
+    if (!message) return;
+
+    API.post("/educator/reply", {
+      doubtId: doubtId,
+      answer: message
+    }, {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+    .then(() => {
+      alert("Reply submitted ✅");
+      setReplies((current) => ({
+        ...current,
+        [doubtId]: ""
+      }));
+    })
+    .catch(err => console.error(err));
   };
 
   return (
@@ -45,8 +77,6 @@ const Doubts = () => {
       body{
         background:#f4f6fb;
       }
-
-      /* UPDATED TOPBAR */
 
       .topbar{
         background:white;
@@ -82,15 +112,7 @@ const Doubts = () => {
         color:#fff;
         cursor:pointer;
         font-weight:600;
-        transition:0.2s ease;
       }
-
-      .logout-btn:hover{
-        transform:translateY(-1px);
-        box-shadow:0 8px 18px rgba(108,99,255,0.25);
-      }
-
-      /* CONTENT */
 
       .container{
         padding:40px;
@@ -99,25 +121,13 @@ const Doubts = () => {
       }
 
       .back-button{
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
         padding:10px 18px;
         border-radius:8px;
         border:1px solid #6c63ff;
         background:white;
         color:#6c63ff;
-        font-weight:600;
         cursor:pointer;
-        transition:0.25s ease;
         margin-bottom:25px;
-      }
-
-      .back-button:hover{
-        background:#6c63ff;
-        color:white;
-        transform:translateY(-1px);
-        box-shadow:0 8px 18px rgba(108,99,255,0.25);
       }
 
       .doubt-card{
@@ -126,12 +136,6 @@ const Doubts = () => {
         border-radius:12px;
         margin-bottom:25px;
         box-shadow:0 5px 15px rgba(0,0,0,0.05);
-        transition:0.2s;
-      }
-
-      .doubt-card:hover{
-        transform:translateY(-3px);
-        box-shadow:0 10px 25px rgba(0,0,0,0.08);
       }
 
       .student-name{
@@ -150,57 +154,56 @@ const Doubts = () => {
         border:1px solid #ddd;
         border-radius:8px;
         padding:12px;
-        resize:none;
-        font-size:14px;
       }
 
-      textarea:focus{
-        outline:none;
-        border:1px solid #6c63ff;
+      .reply-btn{
+        margin-top:10px;
+        padding:8px 14px;
+        background:#6c63ff;
+        color:white;
+        border:none;
+        border-radius:6px;
+        cursor:pointer;
       }
 
       .reply-status{
         color:#2ecc71;
         font-size:13px;
-        font-weight:500;
         margin-top:8px;
       }
 
       `}</style>
 
-      {/* UPDATED NAVBAR */}
-
+      {/* NAVBAR */}
       <div className="topbar">
         <div className="nav-right">
-          <FaUserCircle
-            size={24}
-            className="profile-icon"
-            onClick={goToSettings}
-          />
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <FaUserCircle size={24} className="profile-icon" onClick={goToSettings}/>
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
       </div>
 
       {/* CONTENT */}
-
       <div className="container">
 
         <button
           className="back-button"
           onClick={()=>navigate("/educator/courses")}
         >
-          <FaArrowLeft />
-          Back to Courses
+          <FaArrowLeft /> Back
         </button>
+
+        {doubts.length === 0 && (
+          <div className="doubt-card">
+            <div className="question">No doubts yet for your courses.</div>
+          </div>
+        )}
 
         {doubts.map(d => (
 
           <div key={d.id} className="doubt-card">
 
             <div className="student-name">
-              {d.student}
+              {d.studentEmail}
             </div>
 
             <div className="question">
@@ -208,14 +211,21 @@ const Doubts = () => {
             </div>
 
             <textarea
-              placeholder="Write your reply to the student..."
+              placeholder="Write your reply..."
               value={replies[d.id] || ""}
               onChange={(e)=>handleReply(d.id, e.target.value)}
             />
 
+            <button
+              className="reply-btn"
+              onClick={()=>submitReply(d.id)}
+            >
+              Submit Reply
+            </button>
+
             {replies[d.id] && (
               <div className="reply-status">
-                ✔ Reply Saved
+                ✔ Ready to submit
               </div>
             )}
 
@@ -224,7 +234,6 @@ const Doubts = () => {
         ))}
 
       </div>
-
     </>
   );
 };
