@@ -2,7 +2,7 @@ import axios from "axios";
 import { clearCurrentUser, getAuthToken, isTokenExpired } from "../utils/auth";
 
 const API = axios.create({
-  baseURL: "http://localhost:3366/api", // ✅ FIXED
+  baseURL: "https://backend-repo-production-f790.up.railway.app/api", // ✅ FIXED
 });
 
 // 🔐 Add token automatically to every request

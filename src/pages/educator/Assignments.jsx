@@ -367,7 +367,7 @@ const Assignments = () => {
                   {submission.fileUrl && (
                     <a
                       className="file-link"
-                      href={`http://localhost:3366${submission.fileUrl}`}
+                      href={`https://backend-repo-production-f790.up.railway.app${submission.fileUrl}`}
                       target="_blank"
                       rel="noreferrer"
                     >

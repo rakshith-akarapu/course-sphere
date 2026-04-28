@@ -26,7 +26,7 @@ function Dashboard() {
 
   const recentCourse = courses[0];
   const recentProgress = recentCourse?.progress ?? 0;
-  const noteUrl = recentCourse?.fileUrl ? `http://localhost:3366${recentCourse.fileUrl}` : "";
+  const noteUrl = recentCourse?.fileUrl ? `https://backend-repo-production-f790.up.railway.app${recentCourse.fileUrl}` : "";
 
   return (
     <div className="dashboard-layout">

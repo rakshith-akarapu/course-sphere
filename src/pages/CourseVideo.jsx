@@ -214,7 +214,7 @@ function CourseVideo() {
                   <p>Lecture Notes</p>
                   <small>Download supporting notes for this lesson.</small>
                 </div>
-                <a href={`http://localhost:3366${course.fileUrl}`} target="_blank" rel="noreferrer">
+                <a href={`https://backend-repo-production-f790.up.railway.app${course.fileUrl}`} target="_blank" rel="noreferrer">
                   <button type="button" className="btn btn-outline btn-sm"><FiDownload /> Download Notes</button>
                 </a>
               </div>
