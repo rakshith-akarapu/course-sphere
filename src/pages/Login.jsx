@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import img from "../assets/login.png";
@@ -68,7 +69,8 @@ function Login() {
       </div>
 
       <div className="right">
-        <h2 className="title">Welcome Back to CourseSphere</h2>
+        <div className="login-form-container">
+          <h2 className="title">Welcome Back to CourseSphere</h2>
 
         <div className="tabs">
           <button className="tab active">Login</button>
@@ -114,6 +116,41 @@ function Login() {
           Login
         </button>
 
+        <div className="divider">or continue with</div>
+        <div className="google-wrapper">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                const res = await API.post("/auth/google-login", {
+                  credential: credentialResponse.credential
+                });
+                if (res.data.status === "SUCCESS") {
+                  const token = res.data.token;
+                  localStorage.setItem("token", token);
+                  const role = decodeTokenRole(token);
+                  setCurrentUser({ role: role });
+                  alert("Login successful ✅");
+                  if (role === "educator") navigate("/educator/dashboard");
+                  else if (role === "superadmin") navigate("/superadmin/dashboard");
+                  else navigate("/dashboard");
+                } else if (res.data.status === "USER_NOT_FOUND") {
+                  alert("Email not found. Redirecting to registration...");
+                  navigate("/register", { state: { email: res.data.email, name: res.data.name } });
+                }
+              } catch (err) {
+                console.error(err);
+                if (err.response && err.response.data && typeof err.response.data === "string" && err.response.data.includes("pending approval")) {
+                    alert("Your account is pending approval from the Super Admin.");
+                } else {
+                    alert("Google Login Failed ❌");
+                }
+              }
+            }}
+            onError={() => { console.log("Login Failed"); }}
+          />
+        </div>
+
+        </div>
       </div>
     </div>
   );

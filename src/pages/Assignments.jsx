@@ -62,6 +62,7 @@ function Assignments() {
 
             <div className="assignments-row assignments-row-head">
               <span>Assignment Title</span>
+              <span>Question</span>
               <span>Course</span>
               <span>Due Date</span>
               <span>Status</span>
@@ -76,6 +77,8 @@ function Assignments() {
                 <div key={assignment.id} className="assignments-row">
 
                   <span>{assignment.title}</span>
+
+                  <span className="truncate" title={assignment.question}>{assignment.question}</span>
 
                   <span>{assignment.courseId}</span>
 
@@ -109,6 +112,7 @@ function Assignments() {
             {!errorMessage && assignments.length === 0 && (
               <div className="assignments-row">
                 <span>No assignments yet</span>
+                <span>-</span>
                 <span>-</span>
                 <span>-</span>
                 <span>-</span>

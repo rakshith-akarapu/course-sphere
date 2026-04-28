@@ -1,11 +1,12 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/Register.css";
 import img from "../assets/register.png";
 
 function Register() {
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div className="register">
@@ -41,14 +42,24 @@ function Register() {
         <button
           type="button"
           className="box"
-          onClick={() => navigate("/join/student")}
+          onClick={() => navigate("/join/student", { state: location.state })}
         >
           <span>I'm a learner</span>
           <span>→</span>
         </button>
 
+        <button
+          type="button"
+          className="box"
+          style={{marginTop: "16px"}}
+          onClick={() => navigate("/join/educator", { state: location.state })}
+        >
+          <span>I'm an educator</span>
+          <span>→</span>
+        </button>
+
         <p>
-          Educator accounts are managed privately. Public registration is available only for students.
+          Educator accounts require approval from the Super Admin before they can be used.
         </p>
 
       </div>

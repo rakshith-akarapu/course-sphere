@@ -25,6 +25,10 @@ import Students from "./pages/educator/Students";
 import Doubts from "./pages/educator/Doubts";
 import EducatorSettings from "./pages/educator/Settings";
 
+/* ---------------- SUPER ADMIN PAGES ---------------- */
+import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
+import EducatorRegister from "./pages/EducatorRegister";
+
 /* ---------------- ROLE PROTECTION ---------------- */
 
 function RequireRole({ children, role }) {
@@ -37,9 +41,8 @@ function RequireRole({ children, role }) {
 
   if (userRole !== role) {
     // Redirect user to their correct dashboard
-    return userRole === "educator"
-      ? <Navigate to="/educator/dashboard" replace />
-      : <Navigate to="/dashboard" replace />;
+    if (userRole === "superadmin") return <Navigate to="/superadmin/dashboard" replace />;
+    return userRole === "educator" ? <Navigate to="/educator/dashboard" replace /> : <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -53,9 +56,8 @@ function RedirectByRole() {
 
   if (!user) return <Navigate to="/" replace />;
 
-  return userRole === "educator"
-    ? <Navigate to="/educator/dashboard" replace />
-    : <Navigate to="/dashboard" replace />;
+  if (userRole === "superadmin") return <Navigate to="/superadmin/dashboard" replace />;
+    return userRole === "educator" ? <Navigate to="/educator/dashboard" replace /> : <Navigate to="/dashboard" replace />;
 }
 
 /* ---------------- APP ---------------- */
@@ -70,7 +72,19 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/join/:role" element={<JoinUs />} />
-        <Route path="/educator/register" element={<Navigate to="/join/student" replace />} />
+        <Route path="/join/educator" element={<EducatorRegister />} />
+        <Route path="/educator/register" element={<Navigate to="/join/educator" replace />} />
+
+        {/* -------- SUPER ADMIN ROUTES -------- */}
+
+        <Route
+          path="/superadmin/dashboard"
+          element={
+            <RequireRole role="superadmin">
+              <SuperAdminDashboard />
+            </RequireRole>
+          }
+        />
 
         {/* -------- STUDENT ROUTES -------- */}
 

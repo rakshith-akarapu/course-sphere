@@ -31,6 +31,7 @@ function detectRole(email) {
 
 export function normalizeRole(role) {
   const normalized = String(role || "").trim().toLowerCase();
+  if (normalized === "superadmin") return "superadmin";
   return normalized === "educator" ? "educator" : "student";
 }
 

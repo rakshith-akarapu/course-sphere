@@ -56,7 +56,7 @@
 
 .assignments-row {
   display: grid;
-  grid-template-columns: minmax(250px, 1.8fr) minmax(200px, 1.4fr) minmax(130px, 1fr) 120px 120px;
+  grid-template-columns: minmax(140px, 1.2fr) minmax(250px, 2.5fr) minmax(80px, 0.8fr) minmax(100px, 1fr) 100px 100px;
   align-items: center;
   gap: 14px;
   background: #ffffff;
@@ -125,4 +125,12 @@
   .assignments-row {
     min-width: 900px;
   }
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
 }

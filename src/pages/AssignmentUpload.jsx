@@ -49,8 +49,7 @@ function AssignmentUpload() {
         formData,
         {
           headers: {
-            Authorization: "Bearer " + token,
-            "Content-Type": "multipart/form-data"
+            Authorization: "Bearer " + token
           }
         }
       );

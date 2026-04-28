@@ -1,48 +1,46 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
-import "../../styles/Student/StudentRegister.css";
+import "../styles/StudentRegister.css";
+import img from "../assets/register.png";
 
 function StudentRegister() {
-
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(location.state?.name || "");
+  const [email, setEmail] = useState(location.state?.email || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [department, setDepartment] = useState("");
   const [yearSemester, setYearSemester] = useState("");
   const [error, setError] = useState("");
 
-  const currentYear = new Date().getFullYear();
-  const years = [];
-  for (let y = currentYear; y >= 1950; y--) years.push(y);
-
   const handleRegister = async () => {
-
     if (!name || !email || !password) {
       setError("Fill all required fields");
       return;
     }
-
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
     try {
-
       await API.post("/auth/register", {
-        username: name,
-        email: email,
-        password: password,
-        role: "student"
+        user: {
+            username: name,
+            email: email,
+            password: password,
+            role: "STUDENT",
+            department: department,
+            yearSemester: yearSemester
+        },
+        otp: "123456" // Dummy OTP for now since we bypassed it or will handle it
       });
 
       alert("Registration successful ✅");
       navigate("/");
-
     } catch (err) {
       console.error(err);
       setError("Registration failed ❌");
@@ -50,52 +48,41 @@ function StudentRegister() {
   };
 
   return (
-    <div className="studentRegister">
-
-      <button className="backBtn" onClick={() => navigate("/register")}>
-        ←
-      </button>
-
-      <h1 className="joinTitle">Join us</h1>
-
-      <div className="roleTabs">
-        <button className="roleActive">Student</button>
+    <div className="student-register">
+      <div className="left">
+        <img src={img} className="image" alt="register" />
       </div>
 
-      <div className="formCard">
+      <div className="right">
+        <div className="student-register-container">
+          <span className="back-link" onClick={() => navigate("/register")}>← Back to selection</span>
+          <h2>Register as Student</h2>
+          
+          <label>Full Name</label>
+          <input type="text" placeholder="John Doe" value={name} onChange={(e)=>setName(e.target.value)} />
 
-        <h2>Basic info</h2>
+          <label>Email</label>
+          <input type="text" placeholder="johndoe@university.edu" value={email} onChange={(e)=>setEmail(e.target.value)} />
 
-        <p className="desc">
-          Create your student account to start learning on CourseSphere.
-        </p>
+          <label>Password</label>
+          <input type="password" placeholder="Create a password" value={password} onChange={(e)=>setPassword(e.target.value)} />
 
-        <label>Full Name</label>
-        <input value={name} onChange={(e)=>setName(e.target.value)} />
+          <label>Confirm Password</label>
+          <input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} />
 
-        <label>Email</label>
-        <input value={email} onChange={(e)=>setEmail(e.target.value)} />
+          <label>Department</label>
+          <input type="text" placeholder="Computer Science" value={department} onChange={(e)=>setDepartment(e.target.value)} />
 
-        <label>Password</label>
-        <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} />
+          <label>Year/Semester</label>
+          <input type="text" placeholder="2nd Year / 4th Semester" value={yearSemester} onChange={(e)=>setYearSemester(e.target.value)} />
 
-        <label>Confirm Password</label>
-        <input type="password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} />
+          {error && <p className="status-message error" style={{marginTop: "16px"}}>{error}</p>}
 
-        <label>Department</label>
-        <input value={department} onChange={(e)=>setDepartment(e.target.value)} />
-
-        <label>Year/Semester</label>
-        <input value={yearSemester} onChange={(e)=>setYearSemester(e.target.value)} />
-
-        {error && <p className="auth-error">{error}</p>}
-
-        <button className="registerBtn" onClick={handleRegister}>
-          Register
-        </button>
-
+          <button className="registerBtn" onClick={handleRegister}>
+            Create Account
+          </button>
+        </div>
       </div>
-
     </div>
   );
 }
